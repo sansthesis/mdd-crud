@@ -12,9 +12,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import com.github.jasonrose.crud.om.AbstractEntity;
+import com.praxissoftware.rest.core.AbstractMapEntity;
 
-public class DefaultResource<E extends AbstractEntity> {
+public class DefaultResource<E extends AbstractMapEntity> {
   private final Dao<E> dao;
 
   public DefaultResource(final Dao<E> dao) {

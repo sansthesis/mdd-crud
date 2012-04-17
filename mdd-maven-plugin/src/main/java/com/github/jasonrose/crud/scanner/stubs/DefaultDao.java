@@ -9,11 +9,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
-import com.github.jasonrose.crud.om.AbstractEntity;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.praxissoftware.rest.core.AbstractMapEntity;
 
-public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
+public class DefaultDao<E extends AbstractMapEntity> implements Dao<E> {
   private final Map<Long, E> map = Maps.newHashMap();
   private final Validator validator;
 
@@ -24,16 +24,11 @@ public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
   @Override
   public E create(final E entity) {
     validate(validator, entity);
-    final AbstractEntity mapEntity = map.get(entity.getId());
+    final E mapEntity = map.get(entity.get("id"));
     if( mapEntity != null ) {
-      throw new IllegalStateException("Entity with id " + entity.getId() + " already exists!");
+      throw new IllegalStateException("Entity with id " + entity.get("id") + " already exists!");
     }
-    return map.put(entity.getId(), entity);
-  }
-
-  @Override
-  public boolean delete(final E entity) {
-    return delete(entity.getId());
+    return map.put((Long) entity.get("id"), entity);
   }
 
   @Override
@@ -54,11 +49,11 @@ public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
   @Override
   public E update(final E entity) {
     validate(validator, entity);
-    final AbstractEntity mapEntity = map.get(entity.getId());
+    final E mapEntity = map.get(entity.get("id"));
     if( mapEntity == null ) {
-      throw new IllegalStateException("Entity with id " + entity.getId() + " doesn't exist!");
+      throw new IllegalStateException("Entity with id " + entity.get("id") + " doesn't exist!");
     }
-    return map.put(entity.getId(), entity);
+    return map.put((Long) entity.get("id"), entity);
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })

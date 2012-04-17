@@ -10,7 +10,7 @@
 
   <modules>
     <module>om</module>
-    <!-- <module>maven-plugin</module> -->
+    <module>mdd-maven-plugin</module>
   </modules>
 
   <dependencyManagement>

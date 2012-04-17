@@ -7,38 +7,11 @@
     <relativePath>..</relativePath>
   </parent>
   
-  <artifactId>mdd-maven-plugin</artifactId>
-  <packaging>maven-plugin</packaging>
+  <artifactId>com.github.jasonrose.crud.example</artifactId>
 
-  <name>Proof of Concept - MDD Application - Maven Plugin</name>
-  
-  <properties>
-    <maven.version>2.2.1</maven.version>
-  </properties>
-  
-  <prerequisites>
-    <maven>2.2.1</maven>
-  </prerequisites>
+  <name>Proof of Concept - MDD Application - Example</name>
 
   <dependencies>
-  
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-      <version>${maven.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>${maven.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>${project.groupId}.crud.om</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
     <dependency>
       <groupId>com.github.praxissoftware.rest</groupId>
       <artifactId>com.github.praxissoftware.rest.core</artifactId>
@@ -71,6 +44,11 @@
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jpa_2.0_spec</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
     </dependency>
 
     <dependency>

@@ -6,7 +6,7 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.jasonrose.crud.scanner.stubs.Dao;
+import com.github.jasonrose.crud.om.Dao;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;

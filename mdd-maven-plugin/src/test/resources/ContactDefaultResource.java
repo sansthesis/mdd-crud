@@ -1,15 +1,15 @@
 package com.github.jasonrose.crud.om.generated;
 
+import com.github.jasonrose.crud.om.DefaultResource;
 import javax.ws.rs.Produces;
+import com.github.jasonrose.crud.om.Dao;
 import javax.ws.rs.POST;
-import com.github.jasonrose.crud.scanner.stubs.Dao;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
 import com.github.jasonrose.crud.om.Contact;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
-import com.github.jasonrose.crud.scanner.stubs.DefaultResource;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;

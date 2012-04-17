@@ -11,6 +11,7 @@
   <modules>
     <module>om</module>
     <module>mdd-maven-plugin</module>
+    <module>example</module>
   </modules>
 
   <dependencyManagement>

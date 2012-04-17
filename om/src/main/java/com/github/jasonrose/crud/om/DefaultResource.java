@@ -1,4 +1,4 @@
-package com.github.jasonrose.crud.scanner.stubs;
+package com.github.jasonrose.crud.om;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;

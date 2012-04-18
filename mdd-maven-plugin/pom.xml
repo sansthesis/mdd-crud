@@ -40,6 +40,12 @@
     </dependency>
     
     <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.5</version>
+    </dependency>
+    
+    <dependency>
       <groupId>com.github.praxissoftware.rest</groupId>
       <artifactId>com.github.praxissoftware.rest.core</artifactId>
     </dependency>

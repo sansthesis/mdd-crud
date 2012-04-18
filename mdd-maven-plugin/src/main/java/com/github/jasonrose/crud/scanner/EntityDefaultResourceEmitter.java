@@ -30,7 +30,9 @@ import com.google.common.io.Resources;
 import com.sampullara.mustache.Mustache;
 import com.sampullara.mustache.MustacheBuilder;
 
-public class EntityDefaultResourceEmitter {
+public class EntityDefaultResourceEmitter implements Emitter {
+
+  @Override
   public Emission emit(final Model model) {
     Writer out = null;
     Emission output = null;

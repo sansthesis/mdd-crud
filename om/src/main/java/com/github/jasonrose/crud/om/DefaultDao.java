@@ -20,6 +20,10 @@ public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
     this.validator = validator;
   }
 
+  public DefaultDao() {
+    this(new NoOpValidator());
+  }
+
   @Override
   public E create(final E entity) {
     validate(validator, entity);

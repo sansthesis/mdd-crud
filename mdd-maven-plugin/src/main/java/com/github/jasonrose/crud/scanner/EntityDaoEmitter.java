@@ -18,7 +18,9 @@ import com.google.common.io.Resources;
 import com.sampullara.mustache.Mustache;
 import com.sampullara.mustache.MustacheBuilder;
 
-public class EntityDaoEmitter {
+public class EntityDaoEmitter implements Emitter {
+
+  @Override
   public Emission emit(final Model model) {
     Writer out = null;
     Emission output = null;

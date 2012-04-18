@@ -1,13 +1,23 @@
 package com.github.jasonrose.crud.scanner;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+
+import javax.persistence.Entity;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.DirectoryScanner;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 
 /**
  * This Mojo creates a list of all source files of a Maven project.
@@ -25,32 +35,10 @@ public class MDDGeneratorMojo extends AbstractMojo {
   private File outputDirectory;
 
   /**
-   * Project the plugin is called from.
-   * 
-   * @parameter expression="${project}"
-   */
-  private MavenProject project;
-
-  /**
-   * Defines files in the source directories to include (all .java files by default).
-   * 
-   * @parameter
-   */
-  private final String[] includes = { "**/*.java" };
-
-  /**
-   * Defines which of the included files in the source directories to exclude (non by default).
-   * 
-   * @parameter
-   */
-  private String[] excludes;
-
-  /**
    * Main method executed by maven for this mojo.
    * 
    * @throws MojoExecutionException propagated.
    */
-  @SuppressWarnings("unchecked")
   @Override
   public void execute() throws MojoExecutionException {
     final Log log = getLog();
@@ -58,49 +46,30 @@ public class MDDGeneratorMojo extends AbstractMojo {
     log.info("creating source list file '" + outputDirectory.getAbsolutePath() + "'");
 
     outputDirectory.mkdirs();
-    scan(project.getCompileSourceRoots(), outputDirectory);
-  }
-
-  /**
-   * Scans a set of directories.
-   * 
-   * @param roots Directories to scan
-   * @throws MojoExecutionException propagated.
-   */
-  private void scan(final List<String> roots, final File directory) throws MojoExecutionException {
-    for( final String root : roots ) {
-      scan(new File(root), directory);
-    }
-  }
-
-  /**
-   * Scans a single directory.
-   * 
-   * @param root Directory to scan
-   * @throws MojoExecutionException in case of IO errors
-   */
-  private void scan(final File root, final File directory) throws MojoExecutionException {
-    final Log log = getLog();
-
-    if( !root.exists() ) {
-      return;
-    }
-
-    log.info("scanning source file directory '" + root + "'");
-
-    final DirectoryScanner directoryScanner = new DirectoryScanner();
-    directoryScanner.setIncludes(includes);
-    directoryScanner.setExcludes(excludes);
-    directoryScanner.setBasedir(root);
-    directoryScanner.scan();
-
-    for( final String fileName : directoryScanner.getIncludedFiles() ) {
-      final File file = new File(root, fileName);
-      try {
-        log.info("I'd be evaluating " + file.getName() + " if I knew how.");
-      } catch( final Exception e ) {
-        throw new MojoExecutionException("io error while writing source list", e);
+    final Reflections reflections = new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClassLoader()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
+    final Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
+    log.debug("Generating output for classes: " + entities);
+    final List<Emitter> emitters = Arrays.asList(new EntityDaoEmitter(), new EntityDefaultDaoEmitter(), new EntityDefaultResourceEmitter());
+    final ClassScanner scanner = new ClassScanner();
+    for( final Class<?> entity : entities ) {
+      for( final Emitter emitter : emitters ) {
+        final Model model = scanner.generateModel(entity);
+        final Emission emission = emitter.emit(model);
+        outputGeneratedFile(outputDirectory, emission);
       }
+    }
+  }
+
+  private void outputGeneratedFile(final File root, final Emission emission) throws MojoExecutionException {
+    final Log log = getLog();
+    final File outputFile = new File(root, emission.getFilename().replace(".", "/") + ".java");
+    log.debug("Outputting to: " + outputFile);
+    try {
+      Files.createParentDirs(outputFile);
+      outputFile.createNewFile();
+      Files.write(emission.getContent(), outputFile, Charsets.UTF_8);
+    } catch( final Exception e ) {
+      throw new MojoExecutionException("Unable to write to file " + outputFile.getAbsolutePath() + ".", e);
     }
   }
 }

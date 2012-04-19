@@ -14,6 +14,7 @@ public class {{{entityClassName}}}DefaultDao extends DefaultDao<{{{entityClassNa
   }
   {{#relationships}}
   
+  @Override
   public {{{returnType}}} {{{methodName}}}(Long id) {
     return {{{getterMethodName}}}("{{{propertyName}}}", id);
   }

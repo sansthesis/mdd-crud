@@ -14,18 +14,22 @@ public class PersonDefaultDao extends DefaultDao<Person> implements PersonDao {
     super();
   }
   
+  @Override
   public Person getPersonBySpouse(Long id) {
     return getByOneRelationship("spouse", id);
   }
   
+  @Override
   public Set<Person> getPersonsByParent(Long id) {
     return getByManyRelationship("parent", id);
   }
   
+  @Override
   public Set<Person> getPersonsByFriend(Long id) {
     return getByManyRelationship("friends", id);
   }
   
+  @Override
   public Person getPersonByChild(Long id) {
     return getByOneRelationship("childs", id);
   }

@@ -26,28 +26,28 @@ public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>> {
   @Produces({ "application/json" })
   @Consumes({ "application/json" })
   public Response create(@Context final UriInfo uriInfo, final E entity) {
-    return Response.ok(this.dao.create(entity)).build();
+    return Response.ok(dao.create(entity)).build();
   }
 
   @Path("{id: \\d+}")
   @DELETE
   @Produces({ "application/json" })
   public Response delete(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
-    return Response.ok(Boolean.valueOf(this.dao.delete(id))).build();
+    return Response.ok(Boolean.valueOf(dao.delete(id))).build();
   }
 
   @Path("{id: \\d+}")
   @GET
   @Produces({ "application/json" })
   public Response get(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
-    return Response.ok(this.dao.get(id)).build();
+    return Response.ok(dao.get(id)).build();
   }
 
   @Path("")
   @GET
   @Produces({ "application/json" })
   public Response list(@Context final UriInfo uriInfo) {
-    return Response.ok(this.dao.list()).build();
+    return Response.ok(dao.list()).build();
   }
 
   @Path("{id: \\d+}")
@@ -55,10 +55,10 @@ public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>> {
   @Produces({ "application/json" })
   @Consumes({ "application/json" })
   public Response update(@Context final UriInfo uriInfo, @PathParam("id") final Long id, final E entity) {
-    return Response.ok(this.dao.update(entity)).build();
+    return Response.ok(dao.update(entity)).build();
   }
 
-  protected Dao<E> getDao() {
-    return this.dao;
+  protected D getDao() {
+    return dao;
   }
 }

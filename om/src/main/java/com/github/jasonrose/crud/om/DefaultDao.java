@@ -67,4 +67,14 @@ public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
     }
     return true;
   }
+
+  @Override
+  public Set<E> getByManyRelationship(final String relationshipName, final Long id) {
+    throw new UnsupportedOperationException("Not implemented.");
+  }
+
+  @Override
+  public E getByOneRelationship(final String relationshipName, final Long id) {
+    throw new UnsupportedOperationException("Not implemented.");
+  }
 }

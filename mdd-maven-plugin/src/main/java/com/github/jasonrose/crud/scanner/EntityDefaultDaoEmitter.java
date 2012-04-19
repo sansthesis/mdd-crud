@@ -4,8 +4,6 @@ import java.beans.PropertyDescriptor;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.ParameterizedType;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,30 +50,40 @@ public class EntityDefaultDaoEmitter implements Emitter {
       imports.add(createImport(model.getEntityClassName()));
       imports.add(createImport(DefaultDao.class.getName()));
       imports.add(createImport(Validator.class.getName()));
+
+      // Add custom getter methods to fetch entities by their relationships' ids.
       for( final PropertyDescriptor relationshipDescriptor : model.getRelationships() ) {
         final Map<String, Object> relationship = Maps.newHashMap();
         relationships.add(relationship);
-        final Class<?> propertyClass = relationshipDescriptor.getPropertyType();
-        Class<?> targetEntityType = propertyClass;
-        if( Collection.class.isAssignableFrom(propertyClass) ) {
-          final ParameterizedType stringListType = (ParameterizedType) relationshipDescriptor.getReadMethod().getGenericReturnType();
-          targetEntityType = (Class<?>) stringListType.getActualTypeArguments()[0];
-        }
 
         final String methodName;
         final String returnType;
+        final String getterMethodName;
         if( relationshipDescriptor.getReadMethod().getAnnotation(ManyToMany.class) != null || relationshipDescriptor.getReadMethod().getAnnotation(ManyToOne.class) != null ) {
-          methodName = String.format("get%ssBy%s", model.getEntityClassSimpleName(), targetEntityType.getSimpleName());
+          if( relationshipDescriptor.getReadMethod().getAnnotation(ManyToMany.class) != null ) {
+            methodName = String.format("get%ssBy%s", model.getEntityClassSimpleName(), capitalize(depluralize(relationshipDescriptor.getName())));
+          } else {
+            methodName = String.format("get%ssBy%s", model.getEntityClassSimpleName(), capitalize(relationshipDescriptor.getName()));
+          }
           returnType = "Set<" + model.getEntityClassSimpleName() + ">";
           imports.add(createImport(Set.class.getName()));
+          getterMethodName = "getByManyRelationship";
         } else if( relationshipDescriptor.getReadMethod().getAnnotation(OneToMany.class) != null || relationshipDescriptor.getReadMethod().getAnnotation(OneToOne.class) != null ) {
-          methodName = String.format("get%sBy%s", model.getEntityClassSimpleName(), targetEntityType.getSimpleName());
+          if( relationshipDescriptor.getReadMethod().getAnnotation(OneToMany.class) != null ) {
+            methodName = String.format("get%sBy%s", model.getEntityClassSimpleName(), capitalize(depluralize(relationshipDescriptor.getName())));
+          } else {
+            methodName = String.format("get%sBy%s", model.getEntityClassSimpleName(), capitalize(relationshipDescriptor.getName()));
+          }
+          //          methodName = String.format("get%sBy%s", model.getEntityClassSimpleName(), relationshipDescriptor.getName());
           returnType = model.getEntityClassSimpleName();
+          getterMethodName = "getByOneRelationship";
         } else {
           throw new IllegalStateException("Unable to figure out the relationship type of " + relationshipDescriptor.getReadMethod().getName());
         }
         relationship.put("methodName", methodName);
         relationship.put("returnType", returnType);
+        relationship.put("getterMethodName", getterMethodName);
+        relationship.put("propertyName", relationshipDescriptor.getName());
       }
 
       mustache.execute(out, context);
@@ -84,6 +92,16 @@ public class EntityDefaultDaoEmitter implements Emitter {
       Throwables.propagate(e);
     }
     return output;
+  }
+
+  // owners => owner
+  private String depluralize(final String propertyName) {
+    return String.format("%s", propertyName.substring(0, propertyName.length() - 1));
+  }
+
+  // owner => Owner
+  private String capitalize(final String propertyName) {
+    return String.format("%s%s", propertyName.substring(0, 1).toUpperCase(), propertyName.substring(1));
   }
 
   private Map<String, Object> createImport(final Object value) {

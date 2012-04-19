@@ -12,10 +12,10 @@ public class {{{entityClassName}}}DefaultDao extends DefaultDao<{{{entityClassNa
   public {{{entityClassName}}}DefaultDao() {
     super();
   }
-  
   {{#relationships}}
+  
   public {{{returnType}}} {{{methodName}}}(Long id) {
-    throw new UnsupportedOperationException("Not implemented yet.");
+    return {{{getterMethodName}}}("{{{propertyName}}}", id);
   }
   {{/relationships}}
 }

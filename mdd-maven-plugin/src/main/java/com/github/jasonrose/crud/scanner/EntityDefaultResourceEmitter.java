@@ -17,7 +17,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import com.github.jasonrose.crud.om.Dao;
 import com.github.jasonrose.crud.om.DefaultResource;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
@@ -52,7 +51,6 @@ public class EntityDefaultResourceEmitter implements Emitter {
 
       imports.add(createImport(model.getEntityClassName()));
       imports.add(createImport(DefaultResource.class.getName()));
-      imports.add(createImport(Dao.class.getName()));
       imports.add(createImport(Path.class.getName()));
       imports.add(createImport(PUT.class.getName()));
       imports.add(createImport(Produces.class.getName()));
@@ -63,6 +61,7 @@ public class EntityDefaultResourceEmitter implements Emitter {
       imports.add(createImport(PathParam.class.getName()));
       imports.add(createImport(POST.class.getName()));
       imports.add(createImport(MediaType.class.getName()));
+      imports.add(createImport(String.format("%s.%s%s", context.get("package"), model.getEntityClassSimpleName(), "Dao")));
 
       mustache.execute(out, context);
       output = new Emission(context.get("package") + "." + context.get("entityClassName") + "DefaultResource", out.toString());

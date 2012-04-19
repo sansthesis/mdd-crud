@@ -14,10 +14,10 @@ import javax.ws.rs.core.UriInfo;
 
 import com.praxissoftware.rest.core.AbstractMapEntity;
 
-public class DefaultResource<E extends AbstractMapEntity> {
-  private final Dao<E> dao;
+public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>> {
+  private final D dao;
 
-  public DefaultResource(final Dao<E> dao) {
+  public DefaultResource(final D dao) {
     this.dao = dao;
   }
 

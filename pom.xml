@@ -19,10 +19,18 @@
       <dependency>
         <groupId>com.github.praxissoftware.poms</groupId>
         <artifactId>com.github.praxissoftware.poms.commons</artifactId>
-        <version>1.1.0</version>
+        <version>1.2.0-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <groupId>com.github.praxissoftware.poms</groupId>
+        <artifactId>com.github.praxissoftware.poms.rest</artifactId>
+        <version>1.2.0-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <dependency>
         <groupId>com.github.praxissoftware.poms</groupId>
         <artifactId>com.github.praxissoftware.poms.testing</artifactId>
@@ -30,12 +38,11 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
       <dependency>
-        <groupId>com.github.praxissoftware.poms</groupId>
-        <artifactId>com.github.praxissoftware.poms.rest</artifactId>
-        <version>1.1.0</version>
-        <type>pom</type>
-        <scope>import</scope>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.6.4</version>
       </dependency>
 
       <dependency>

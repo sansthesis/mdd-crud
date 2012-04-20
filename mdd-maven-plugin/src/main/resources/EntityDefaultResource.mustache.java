@@ -7,6 +7,7 @@ import {{{import}}};
 @Path("{{{entityClassName}}}")
 public class {{{entityClassName}}}DefaultResource extends DefaultResource<{{{entityClassName}}}, {{{entityClassName}}}Dao> {
 
+  @Inject
   public {{{entityClassName}}}DefaultResource(final {{{entityClassName}}}Dao dao) {
     super(dao);
   }

@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -60,6 +61,7 @@ public class EntityDefaultResourceEmitter implements Emitter {
       imports.add(createImport(UriInfo.class.getName()));
       imports.add(createImport(PathParam.class.getName()));
       imports.add(createImport(POST.class.getName()));
+      imports.add(createImport(Inject.class.getName()));
       imports.add(createImport(MediaType.class.getName()));
       imports.add(createImport(String.format("%s.%s%s", context.get("package"), model.getEntityClassSimpleName(), "Dao")));
 

@@ -20,6 +20,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
@@ -41,7 +42,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
       @Override
       protected void configureServlets() {
         final Map<String, String> params = new HashMap<String, String>();
-        params.put("com.sun.jersey.api.json.POJOMappingFeature", "true");
+        params.put(JSONConfiguration.FEATURE_POJO_MAPPING, "true");
         params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.github.jasonrose.crud.om.generated");
         serve("/mdd-test/*").with(GuiceContainer.class, params);
       }

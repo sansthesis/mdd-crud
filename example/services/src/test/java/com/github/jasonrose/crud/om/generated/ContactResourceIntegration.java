@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.After;
 import org.junit.Before;
@@ -70,27 +72,27 @@ public class ContactResourceIntegration {
       fail(ERR_MSG + e);
     }
   }
-  //
-  //  @Test
-  //  public void testCreateOnce() {
-  //    try {
-  //      {
-  //        final HttpPost request = new HttpPost(URL);
-  //        final StringEntity input = new StringEntity("{\"firstName\":\"Bob\",\"lastName\":\"Bobber\"}");
-  //        input.setContentType("application/json");
-  //        request.setEntity(input);
-  //        final HttpResponse response = client.execute(request);
-  //        assertEquals(200, response.getStatusLine().getStatusCode());
-  //      }
-  //      {
-  //        final HttpResponse response = new DefaultHttpClient().execute(new HttpGet(URL));
-  //        assertEquals(200, response.getStatusLine().getStatusCode());
-  //
-  //        final BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-  //        assertEquals("[]", rd.readLine());
-  //      }
-  //    } catch( final Exception e ) {
-  //      fail(ERR_MSG + e);
-  //    }
-  //  }
+
+  @Test
+  public void testCreateOnce() {
+    try {
+      {
+        final HttpPost request = new HttpPost(URL);
+        final StringEntity input = new StringEntity("{\"firstName\":\"Bob\",\"lastName\":\"Bobber\"}");
+        input.setContentType("application/json");
+        request.setEntity(input);
+        final HttpResponse response = client.execute(request);
+        assertEquals(200, response.getStatusLine().getStatusCode());
+      }
+      {
+        final HttpResponse response = new DefaultHttpClient().execute(new HttpGet(URL));
+        assertEquals(200, response.getStatusLine().getStatusCode());
+
+        final BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+        assertEquals("[{\"lastName\":\"Bobber\",\"divisions\":[],\"firstName\":\"Bob\"}]", rd.readLine());
+      }
+    } catch( final Exception e ) {
+      fail(ERR_MSG + e);
+    }
+  }
 }

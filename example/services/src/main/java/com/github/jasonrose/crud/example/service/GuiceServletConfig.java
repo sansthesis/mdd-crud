@@ -3,6 +3,7 @@ package com.github.jasonrose.crud.example.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Singleton;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
@@ -49,9 +50,9 @@ public class GuiceServletConfig extends GuiceServletContextListener {
     }, new AbstractModule() {
       @Override
       protected void configure() {
-        bind(ContactDao.class).to(ContactDefaultDao.class);
-        bind(DivisionDao.class).to(DivisionDefaultDao.class);
-        bind(PersonDao.class).to(PersonDefaultDao.class);
+        bind(ContactDao.class).to(ContactDefaultDao.class).in(Singleton.class);
+        bind(DivisionDao.class).to(DivisionDefaultDao.class).in(Singleton.class);
+        bind(PersonDao.class).to(PersonDefaultDao.class).in(Singleton.class);
       }
     });
 

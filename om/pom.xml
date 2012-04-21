@@ -6,7 +6,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
-  
+
   <artifactId>com.github.jasonrose.crud.om</artifactId>
 
   <name>Proof of Concept - MDD Application - Model</name>
@@ -16,7 +16,7 @@
       <groupId>com.github.praxissoftware.rest</groupId>
       <artifactId>com.github.praxissoftware.rest.core</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>com.googlecode.guava-osgi</groupId>
       <artifactId>guava-osgi</artifactId>
@@ -25,6 +25,11 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.inject</groupId>
+      <artifactId>guice</artifactId>
     </dependency>
 
     <dependency>
@@ -44,6 +49,10 @@
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jpa_2.0_spec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.inject.extensions</groupId>
+      <artifactId>guice-persist</artifactId>
     </dependency>
 
     <dependency>

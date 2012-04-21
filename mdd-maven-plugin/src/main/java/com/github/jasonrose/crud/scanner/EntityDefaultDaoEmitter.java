@@ -6,8 +6,6 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
-import javax.validation.Validator;
-
 import com.github.jasonrose.crud.om.DefaultDao;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
@@ -36,7 +34,6 @@ public class EntityDefaultDaoEmitter extends EntityDaoEmitter implements Emitter
 
       final Set<Map<String, Object>> imports = (Set<Map<String, Object>>) context.get("imports");
       imports.add(createImport(DefaultDao.class.getName()));
-      imports.add(createImport(Validator.class.getName()));
 
       mustache.execute(out, context);
       output = new Emission(context.get("package") + "." + context.get("entityClassName") + "DefaultDao", out.toString());

@@ -78,7 +78,7 @@ public class ContactResourceIntegration {
     try {
       {
         final HttpPost request = new HttpPost(URL);
-        final StringEntity input = new StringEntity("{\"firstName\":\"Bob\",\"lastName\":\"Bobber\"}");
+        final StringEntity input = new StringEntity("{\"firstName\":\"Bob\",\"lastName\":\"Bobber\",\"email\":\"bob.bobber@gmail.com\"}");
         input.setContentType("application/json");
         request.setEntity(input);
         final HttpResponse response = client.execute(request);
@@ -89,7 +89,7 @@ public class ContactResourceIntegration {
         assertEquals(200, response.getStatusLine().getStatusCode());
 
         final BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        assertEquals("[{\"lastName\":\"Bobber\",\"divisions\":[],\"firstName\":\"Bob\"}]", rd.readLine());
+        assertEquals("[{\"id\":1,\"lastName\":\"Bobber\",\"email\":\"bob.bobber@gmail.com\",\"divisions\":[],\"firstName\":\"Bob\"}]", rd.readLine());
       }
     } catch( final Exception e ) {
       fail(ERR_MSG + e);

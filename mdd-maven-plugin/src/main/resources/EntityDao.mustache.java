@@ -1,7 +1,7 @@
 package {{{package}}};
 
 {{#imports}}
-import {{import}};
+import {{{import}}};
 {{/imports}}
 
 public interface {{{entityClassName}}}Dao extends Dao<{{{entityClassName}}}> {

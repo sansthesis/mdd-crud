@@ -1,0 +1,16 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd" version="2.0">
+  <persistence-unit name="mdd-crud-example" transaction-type="RESOURCE_LOCAL">
+    <description>Persistence using a built-in memory-only H2 (Hyperion) database</description>
+    <class>com.github.jasonrose.crud.om.Contact</class>
+    <class>com.github.jasonrose.crud.om.Division</class>
+    <class>com.github.jasonrose.crud.om.Person</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+    <validation-mode>AUTO</validation-mode>
+    <properties>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+      <property name="hibernate.connection.driver_class" value="org.h2.Driver" />
+      <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+      <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test;DB_CLOSE_DELAY=-1" />
+    </properties>
+  </persistence-unit>
+</persistence>

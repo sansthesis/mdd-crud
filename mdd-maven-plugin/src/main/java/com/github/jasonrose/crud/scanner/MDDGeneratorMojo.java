@@ -17,6 +17,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
 /**
@@ -43,21 +44,27 @@ public class MDDGeneratorMojo extends AbstractMojo {
   public void execute() throws MojoExecutionException {
     final Log log = getLog();
 
-    log.info("creating source list file '" + outputDirectory.getAbsolutePath() + "'");
-
     outputDirectory.mkdirs();
     final Reflections reflections = new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClassLoader()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
     final Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
     log.debug("Generating output for classes: " + entities);
-    final List<Emitter> emitters = Arrays.asList(new EntityDaoEmitter(), new EntityDefaultDaoEmitter(), new EntityDefaultResourceEmitter());
+    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new EntityDaoEmitter(), new EntityDefaultDaoEmitter(), new EntityDefaultResourceEmitter() });
+    final List<Model> models = Lists.newArrayList();
     final ClassScanner scanner = new ClassScanner();
+
+    // Generate an emission for entity x emitter.
     for( final Class<?> entity : entities ) {
       for( final Emitter emitter : emitters ) {
         final Model model = scanner.generateModel(entity);
+        models.add(model);
         final Emission emission = emitter.emit(model);
         outputGeneratedFile(outputDirectory, emission);
       }
     }
+
+    // Generate default Guice module with the generated service bindings defined.
+    final Emission moduleEmission = new DefaultModuleEmitter().emit(models);
+    outputGeneratedFile(outputDirectory, moduleEmission);
   }
 
   private void outputGeneratedFile(final File root, final Emission emission) throws MojoExecutionException {

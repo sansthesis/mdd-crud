@@ -5,18 +5,19 @@ import {{{import}}};
 {{/imports}}
 
 public class {{{entityClassName}}}DefaultDao extends DefaultDao<{{{entityClassName}}}> implements {{{entityClassName}}}Dao {
-  public {{{entityClassName}}}DefaultDao(final Validator validator) {
-    super(validator);
-  }
 
   public {{{entityClassName}}}DefaultDao() {
-    super();
+    this({{{entityClassName}}}.class);
   }
-  {{#relationships}}
-  
+
+  public {{{entityClassName}}}DefaultDao(final Class<? extends {{{entityClassName}}}> entityClass) {
+    super(entityClass);
+  }
+{{#relationships}}
+
   @Override
-  public {{{returnType}}} {{{methodName}}}(Long id) {
+  public {{{returnType}}} {{{methodName}}}(final Long id) {
     return {{{getterMethodName}}}("{{{propertyName}}}", id);
   }
-  {{/relationships}}
+{{/relationships}}
 }

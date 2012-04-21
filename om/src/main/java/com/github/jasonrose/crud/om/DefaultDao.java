@@ -1,80 +1,68 @@
 package com.github.jasonrose.crud.om;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.inject.persist.Transactional;
 
 public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
-  private final Map<Long, E> map = Maps.newHashMap();
-  private final Validator validator;
 
-  public DefaultDao(final Validator validator) {
-    this.validator = validator;
-  }
+  private final Class<? extends E> entityClass;
 
-  public DefaultDao() {
-    this(new NoOpValidator());
+  @Inject
+  protected EntityManager em;
+
+  public DefaultDao(final Class<? extends E> entityClass) {
+    this.entityClass = entityClass;
   }
 
   @Override
+  @Transactional
   public E create(final E entity) {
-    validate(validator, entity);
-    final E mapEntity = map.get(entity.getId());
-    if( mapEntity != null ) {
-      throw new IllegalStateException("Entity with id " + entity.getId() + " already exists!");
-    }
-    return map.put(entity.getId(), entity);
+    em.persist(entity);
+    return entity;
   }
 
   @Override
+  @Transactional
   public boolean delete(final Long id) {
-    return map.remove(id) != null;
-  }
-
-  @Override
-  public E get(final Long id) {
-    return map.get(id);
-  }
-
-  @Override
-  public List<E> list() {
-    return Lists.newArrayList(map.values());
-  }
-
-  @Override
-  public E update(final E entity) {
-    validate(validator, entity);
-    final E mapEntity = map.get(entity.getId());
-    if( mapEntity == null ) {
-      throw new IllegalStateException("Entity with id " + entity.getId() + " doesn't exist!");
-    }
-    return map.put(entity.getId(), entity);
-  }
-
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected boolean validate(final Validator v, final E entity) {
-    final Set<ConstraintViolation<E>> violations = v.validate(entity, new Class[0]);
-    if( violations.size() > 0 ) {
-      throw new ConstraintViolationException(new HashSet(violations));
-    }
+    em.remove(get(id));
     return true;
   }
 
   @Override
+  @Transactional
+  public E get(final Long id) {
+    return em.find(entityClass, id);
+  }
+
+  @Override
+  @Transactional
   public Set<E> getByManyRelationship(final String relationshipName, final Long id) {
     throw new UnsupportedOperationException("Not implemented.");
   }
 
   @Override
+  @Transactional
   public E getByOneRelationship(final String relationshipName, final Long id) {
     throw new UnsupportedOperationException("Not implemented.");
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  @Transactional
+  public List<E> list() {
+    final String selectQueryString = String.format("from %s", entityClass.getName());
+    return em.createQuery(selectQueryString).getResultList();
+  }
+
+  @Override
+  @Transactional
+  public E update(final E entity) {
+    create(entity);
+    return entity;
   }
 }

@@ -13,11 +13,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.github.praxissoftware.rest</groupId>
-      <artifactId>com.github.praxissoftware.rest.core</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>${project.groupId}.crud.om</artifactId>
       <version>${project.version}</version>

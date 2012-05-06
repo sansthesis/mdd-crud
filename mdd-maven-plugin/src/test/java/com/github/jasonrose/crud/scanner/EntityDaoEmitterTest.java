@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.github.jasonrose.crud.om.Contact;
+import com.github.jasonrose.functional.FunctionalImpl;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
@@ -12,7 +13,7 @@ public class EntityDaoEmitterTest {
 
   @Test
   public void testGenerateModel() throws Exception {
-    final EntityDaoEmitter emitter = new EntityDaoEmitter();
+    final EntityDaoEmitter emitter = new EntityDaoEmitter(new SourceGeneratorImpl(), new FunctionalImpl());
     final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
     final Model model = scanner.generateModel(Contact.class);
     final Emission out = emitter.emit(model);

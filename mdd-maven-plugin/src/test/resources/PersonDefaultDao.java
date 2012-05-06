@@ -15,13 +15,13 @@ public class PersonDefaultDao extends DefaultDao<Person> implements PersonDao {
   }
 
   @Override
-  public Person getPersonBySpouse(final Long id) {
-    return getByOneRelationship("spouse", id);
+  public Set<Person> getPersonsByParent(final Long id) {
+    return getByManyRelationship("parent", id);
   }
 
   @Override
-  public Set<Person> getPersonsByParent(final Long id) {
-    return getByManyRelationship("parent", id);
+  public Person getPersonBySpouse(final Long id) {
+    return getByOneRelationship("spouse", id);
   }
 
   @Override

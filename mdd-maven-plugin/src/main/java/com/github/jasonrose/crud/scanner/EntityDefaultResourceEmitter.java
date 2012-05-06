@@ -34,10 +34,8 @@ import com.sampullara.mustache.MustacheException;
 
 public class EntityDefaultResourceEmitter extends AbstractEmitter {
   
-  private final SourceGenerator sourceGenerator; 
-  
   public EntityDefaultResourceEmitter(SourceGenerator sourceGenerator) {
-    this.sourceGenerator = sourceGenerator;
+    super(sourceGenerator);
   }
 
   @Override
@@ -82,8 +80,8 @@ public class EntityDefaultResourceEmitter extends AbstractEmitter {
             PathParam.class,
             POST.class,
             Inject.class,
-            MediaType.class), sourceGenerator.createClassToImportFunction()),
+            MediaType.class), getSourceGenerator().createClassToImportFunction()),
         Iterables.transform(Arrays.asList(model.getEntityClassName(),
-            String.format("%s.%s%s", packageName, model.getEntityClassSimpleName(), "Dao")), sourceGenerator.createClassNameToImportFunction())));
+            String.format("%s.%s%s", packageName, model.getEntityClassSimpleName(), "Dao")), getSourceGenerator().createClassNameToImportFunction())));
   }
 }

@@ -2,66 +2,46 @@ package com.github.jasonrose.crud.scanner;
 
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Locale;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import com.github.jasonrose.crud.om.Dao;
-import com.google.common.base.Charsets;
+import com.github.jasonrose.functional.Functional;
 import com.google.common.base.Function;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.io.CharStreams;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Resources;
 import com.sampullara.mustache.Mustache;
-import com.sampullara.mustache.MustacheBuilder;
 import com.sampullara.mustache.MustacheException;
 
 public class EntityDaoEmitter extends AbstractEmitter {
+  private final Functional functional;
 
-  protected static final Function<Map<String, Object>, Set<Map<String, Object>>> TRANSFORM_RELATIONSHIP_TO_IMPORT = new Function<Map<String, Object>, Set<Map<String, Object>>>() {
-    @SuppressWarnings("unchecked")
-    @Override
-    public Set<Map<String, Object>> apply(final Map<String, Object> input) {
-      final Set<Map<String, Object>> output;
-      if( input == null ) {
-        output = null;
-      } else {
-        output = (Set<Map<String, Object>>) input.get("imports"); 
-      }
-      return output;
-    }
-  };
+  public EntityDaoEmitter(final SourceGenerator sourceGenerator, final Functional functional) {
+    super(sourceGenerator);
+    this.functional = functional;
+  }
 
   @SuppressWarnings("unchecked")
   @Override
   public Emission emit(final Model model) {
-    Writer out = null;
     Emission output = null;
     try {
-      final InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getClassLoader().getResource("EntityDao.mustache.java"), Charsets.UTF_8);
-      final String template = CharStreams.toString(supplier);
-
-      final Mustache mustache = new MustacheBuilder().parse(template, "EntityDao.mustache.java");
-
-      out = new StringWriter();
+      final Mustache mustache = createMustacheTemplate("EntityDao.mustache.java");
 
       final Map<String, Object> context = generateContext(model);
-      final Set<Map<String, Object>> imports = (Set<Map<String, Object>>) context.get("imports");
-      imports.add(createImport(Dao.class.getName()));
+      final Set<Map<String, String>> imports = (Set<Map<String, String>>) context.get("imports");
+      imports.add(getSourceGenerator().createImport(Dao.class));
 
+      final Writer out = new StringWriter();
       mustache.execute(out, context);
       output = new Emission(context.get("package") + "." + context.get("entityClassName") + "Dao", out.toString());
     } catch( IOException ioe ) {
@@ -72,22 +52,8 @@ public class EntityDaoEmitter extends AbstractEmitter {
     return output;
   }
 
-  // owner => Owner
-  protected String capitalize(final String propertyName) {
-    return String.format("%s%s", propertyName.substring(0, 1).toUpperCase(Locale.US), propertyName.substring(1));
-  }
-
-  protected Map<String, Object> createImport(final Object value) {
-    return ImmutableMap.of("import", value);
-  }
-
-  // owners => owner
-  protected String depluralize(final String propertyName) {
-    return String.format("%s", propertyName.substring(0, propertyName.length() - 1));
-  }
-
   protected Map<String, Object> generateContext(final Model model) {
-    final Set<Map<String, Object>> imports = Sets.newHashSet();
+    final Set<Map<String, String>> imports = Sets.newHashSet();
     final Set<Map<String, Object>> relationships = getRelationships(model);
     final Map<String, Object> context = Maps.newHashMap();
     context.put("package", model.getEntityClassPackageName() + ".generated");
@@ -95,8 +61,9 @@ public class EntityDaoEmitter extends AbstractEmitter {
     context.put("imports", imports);
     context.put("relationships", relationships);
 
-    imports.add(createImport(model.getEntityClassName()));
-    for( final Set<Map<String, Object>> importEntries : Iterables.transform(relationships, TRANSFORM_RELATIONSHIP_TO_IMPORT) ) {
+    imports.add(getSourceGenerator().createImport(model.getEntityClassName()));
+    final Function<Map<String, Object>, Set<Map<String, String>>> plucked = functional.pluck("imports");
+    for( final Set<Map<String, String>> importEntries : Iterables.transform(relationships, plucked) ) {
       imports.addAll(importEntries);
     }
     return context;
@@ -104,41 +71,39 @@ public class EntityDaoEmitter extends AbstractEmitter {
 
   protected Set<Map<String, Object>> getRelationships(final Model model) {
     final Set<Map<String, Object>> relationships = Sets.newHashSet();
-    final Set<Map<String, Object>> imports = Sets.newHashSet();
     // Add custom getter methods to fetch entities by their relationships' ids.
     for( final PropertyDescriptor relationshipDescriptor : model.getRelationships() ) {
-      final Map<String, Object> relationship = Maps.newHashMap();
+      final Map<String, Object> relationship = buildRelationshipMapping(model, relationshipDescriptor);
       relationships.add(relationship);
-
-      final String methodName;
-      final String returnType;
-      final String getterMethodName;
-      if( relationshipDescriptor.getReadMethod().getAnnotation(ManyToMany.class) != null || relationshipDescriptor.getReadMethod().getAnnotation(ManyToOne.class) != null ) {
-        if( relationshipDescriptor.getReadMethod().getAnnotation(ManyToMany.class) != null ) {
-          methodName = String.format("get%ssBy%s", model.getEntityClassSimpleName(), capitalize(depluralize(relationshipDescriptor.getName())));
-        } else {
-          methodName = String.format("get%ssBy%s", model.getEntityClassSimpleName(), capitalize(relationshipDescriptor.getName()));
-        }
-        returnType = "Set<" + model.getEntityClassSimpleName() + ">";
-        imports.add(createImport(Set.class.getName()));
-        getterMethodName = "getByManyRelationship";
-      } else if( relationshipDescriptor.getReadMethod().getAnnotation(OneToMany.class) != null || relationshipDescriptor.getReadMethod().getAnnotation(OneToOne.class) != null ) {
-        if( relationshipDescriptor.getReadMethod().getAnnotation(OneToMany.class) != null ) {
-          methodName = String.format("get%sBy%s", model.getEntityClassSimpleName(), capitalize(depluralize(relationshipDescriptor.getName())));
-        } else {
-          methodName = String.format("get%sBy%s", model.getEntityClassSimpleName(), capitalize(relationshipDescriptor.getName()));
-        }
-        returnType = model.getEntityClassSimpleName();
-        getterMethodName = "getByOneRelationship";
-      } else {
-        throw new IllegalStateException("Unable to figure out the relationship type of " + relationshipDescriptor.getReadMethod().getName());
-      }
-      relationship.put("methodName", methodName);
-      relationship.put("returnType", returnType);
-      relationship.put("getterMethodName", getterMethodName);
-      relationship.put("propertyName", relationshipDescriptor.getName());
-      relationship.put("imports", imports);
     }
     return relationships;
+  }
+
+  protected Map<String, Object> buildRelationshipMapping(Model model, PropertyDescriptor relationshipDescriptor) {
+    final Map<String, Object> relationship = Maps.newHashMap();
+    final Set<Map<String, String>> imports = Sets.newHashSet();
+
+    final String returnType;
+    final String getterMethodName;
+    final Method readMethod = relationshipDescriptor.getReadMethod();
+    final boolean isManyTo = readMethod.isAnnotationPresent(ManyToMany.class) || readMethod.isAnnotationPresent(ManyToOne.class);
+    final boolean isToMany = readMethod.isAnnotationPresent(ManyToMany.class) || readMethod.isAnnotationPresent(OneToMany.class);
+
+    if( isManyTo ) {
+      returnType = "Set<" + model.getEntityClassSimpleName() + ">";
+      imports.add(getSourceGenerator().createImport(Set.class));
+      getterMethodName = "getByManyRelationship";
+    } else {
+      returnType = model.getEntityClass().getSimpleName();
+      getterMethodName = "getByOneRelationship";
+    }
+    
+    final String methodName = getSourceGenerator().generateGetByRelationshipMethodName(model.getEntityClass().getSimpleName(), relationshipDescriptor.getName(), isManyTo, isToMany);
+    relationship.put("methodName", methodName);
+    relationship.put("returnType", returnType);
+    relationship.put("getterMethodName", getterMethodName);
+    relationship.put("propertyName", relationshipDescriptor.getName());
+    relationship.put("imports", imports);
+    return relationship;
   }
 }

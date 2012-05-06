@@ -19,7 +19,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 public class BeanAnalyzerImpl implements BeanAnalyzer {
-  private static final Set<Class<? extends Annotation>> relationshipAnnotations = ImmutableSet.of(ManyToMany.class, OneToMany.class, ManyToOne.class, OneToOne.class);
+  private static final Set<Class<? extends Annotation>> RELATIONSHIP_ANNOTATIONS = ImmutableSet.of(ManyToMany.class, OneToMany.class, ManyToOne.class, OneToOne.class);
 
   @Override
   public boolean isDesirableProperty(PropertyDescriptor descriptor) {
@@ -51,7 +51,7 @@ public class BeanAnalyzerImpl implements BeanAnalyzer {
     boolean isValid = false;
     if( descriptor != null ) {
       final Collection<Class<? extends Annotation>> annotations = Lists.newArrayList(Lists.transform(Arrays.asList(descriptor.getReadMethod().getAnnotations()), TRANSFORM_ANNOTATION_TO_CLASS));
-      isValid = annotations.removeAll(relationshipAnnotations);
+      isValid = annotations.removeAll(RELATIONSHIP_ANNOTATIONS);
     }
     return isValid;
   }
@@ -65,7 +65,7 @@ public class BeanAnalyzerImpl implements BeanAnalyzer {
   public boolean isSimpleProperty(PropertyDescriptor descriptor) {
     return !isRelationship(descriptor);
   }
-  
+
   private static final Function<Annotation, Class<? extends Annotation>> TRANSFORM_ANNOTATION_TO_CLASS = new Function<Annotation, Class<? extends Annotation>>() {
     @Override
     public Class<? extends Annotation> apply(final Annotation input) {

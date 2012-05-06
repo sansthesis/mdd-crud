@@ -17,6 +17,8 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
+import com.github.jasonrose.functional.Functional;
+import com.github.jasonrose.functional.FunctionalImpl;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -48,10 +50,11 @@ public class MDDGeneratorMojo extends AbstractMojo {
 
     outputDirectory.mkdirs();
     final SourceGenerator sourceGenerator = new SourceGeneratorImpl();
+    final Functional functional = new FunctionalImpl();
     final Reflections reflections = new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClassLoader()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
     final Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
     log.debug("Generating output for classes: " + entities);
-    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new EntityDaoEmitter(), new EntityDefaultDaoEmitter(), new EntityDefaultResourceEmitter(sourceGenerator) });
+    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new EntityDaoEmitter(sourceGenerator, functional), new EntityDefaultDaoEmitter(sourceGenerator, functional), new EntityDefaultResourceEmitter(sourceGenerator) });
     final List<Model> models = Lists.newArrayList();
     final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
 

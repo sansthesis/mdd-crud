@@ -16,11 +16,9 @@ import com.sampullara.mustache.Mustache;
 import com.sampullara.mustache.MustacheException;
 
 public class DefaultModuleEmitter extends AbstractEmitter {
-  
-  private final SourceGenerator sourceGenerator;
 
   public DefaultModuleEmitter(SourceGenerator sourceGenerator) {
-    this.sourceGenerator = sourceGenerator;
+    super(sourceGenerator);
   }
 
   @Override
@@ -34,14 +32,14 @@ public class DefaultModuleEmitter extends AbstractEmitter {
       final Set<Map<String, String>> bindings = Sets.newHashSet();
       context.put("bindings", bindings);
       context.put("imports", imports);
-      imports.add(sourceGenerator.createImport(AbstractModule.class));
+      imports.add(getSourceGenerator().createImport(AbstractModule.class));
       for( final Model model : models ) {
         final String packageName = model.getEntityClassPackageName() + ".generated";
         context.put("package", packageName);
 
         bindings.add(createBinding(model.getEntityClassSimpleName() + "Dao", model.getEntityClassSimpleName() + "DefaultDao"));
-        imports.add(sourceGenerator.createImport(String.format("%s.%s%s", packageName, model.getEntityClassSimpleName(), "Dao")));
-        imports.add(sourceGenerator.createImport(String.format("%s.%s%s", packageName, model.getEntityClassSimpleName(), "DefaultDao")));
+        imports.add(getSourceGenerator().createImport(String.format("%s.%s%s", packageName, model.getEntityClassSimpleName(), "Dao")));
+        imports.add(getSourceGenerator().createImport(String.format("%s.%s%s", packageName, model.getEntityClassSimpleName(), "DefaultDao")));
       }
       final Writer out = new StringWriter();
       mustache.execute(out, context);

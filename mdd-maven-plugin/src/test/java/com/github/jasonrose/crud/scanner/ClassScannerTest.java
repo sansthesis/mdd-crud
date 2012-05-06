@@ -9,7 +9,7 @@ public class ClassScannerTest {
 
   @Test
   public void testGenerateModel() throws Exception {
-    final ClassScanner scanner = new ClassScanner();
+    final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
     final Model model = scanner.generateModel(Contact.class);
     Assert.assertEquals(Contact.class, model.getEntityClass());
     Assert.assertEquals(Contact.class.getSimpleName(), model.getEntityClassSimpleName());

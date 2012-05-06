@@ -1,10 +1,11 @@
 package com.github.jasonrose.crud.scanner;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -21,16 +22,23 @@ import javax.ws.rs.core.UriInfo;
 import com.github.jasonrose.crud.om.DefaultResource;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.sampullara.mustache.Mustache;
 import com.sampullara.mustache.MustacheBuilder;
+import com.sampullara.mustache.MustacheException;
 
 public class EntityDefaultResourceEmitter extends AbstractEmitter {
+  
+  private final SourceGenerator sourceGenerator; 
+  
+  public EntityDefaultResourceEmitter(SourceGenerator sourceGenerator) {
+    this.sourceGenerator = sourceGenerator;
+  }
 
   @Override
   public Emission emit(final Model model) {
@@ -44,37 +52,38 @@ public class EntityDefaultResourceEmitter extends AbstractEmitter {
 
       out = new StringWriter();
 
-      final Set<Map<String, Object>> imports = Sets.newHashSet();
       final Map<String, Object> context = Maps.newHashMap();
-      context.put("package", model.getEntityClassPackageName() + ".generated");
+      final String packageName = model.getEntityClassPackageName() + ".generated";
+      context.put("package", packageName);
       context.put("entityClassName", model.getEntityClassSimpleName());
-      context.put("imports", imports);
-
-      imports.add(createImport(model.getEntityClassName()));
-      imports.add(createImport(DefaultResource.class.getName()));
-      imports.add(createImport(Path.class.getName()));
-      imports.add(createImport(PUT.class.getName()));
-      imports.add(createImport(Produces.class.getName()));
-      imports.add(createImport(Consumes.class.getName()));
-      imports.add(createImport(Response.class.getName()));
-      imports.add(createImport(Context.class.getName()));
-      imports.add(createImport(UriInfo.class.getName()));
-      imports.add(createImport(PathParam.class.getName()));
-      imports.add(createImport(POST.class.getName()));
-      imports.add(createImport(Inject.class.getName()));
-      imports.add(createImport(MediaType.class.getName()));
-      imports.add(createImport(String.format("%s.%s%s", context.get("package"), model.getEntityClassSimpleName(), "Dao")));
+      context.put("imports", generateImports(model, packageName));
 
       mustache.execute(out, context);
-      output = new Emission(context.get("package") + "." + context.get("entityClassName") + "DefaultResource", out.toString());
-    } catch( final Exception e ) {
-      Throwables.propagate(e);
+      output = new Emission(packageName + "." + model.getEntityClassSimpleName() + "DefaultResource", out.toString());
+    } catch( IOException ioe ) {
+      Throwables.propagate(ioe);
+    } catch( MustacheException me ) {
+      Throwables.propagate(me);
     }
     return output;
   }
 
-  private Map<String, Object> createImport(final Object value) {
-    final Map<String, Object> output = ImmutableMap.of("import", value);
-    return output;
+  @SuppressWarnings("unchecked")
+  private ImmutableSet<Map<String, String>> generateImports(final Model model, final String packageName) {
+    return ImmutableSet.copyOf(Iterables.concat(
+        Iterables.transform(Arrays.asList(DefaultResource.class,
+            Path.class,
+            PUT.class,
+            Produces.class,
+            Consumes.class,
+            Response.class,
+            Context.class,
+            UriInfo.class,
+            PathParam.class,
+            POST.class,
+            Inject.class,
+            MediaType.class), sourceGenerator.createClassToImportFunction()),
+        Iterables.transform(Arrays.asList(model.getEntityClassName(),
+            String.format("%s.%s%s", packageName, model.getEntityClassSimpleName(), "Dao")), sourceGenerator.createClassNameToImportFunction())));
   }
 }

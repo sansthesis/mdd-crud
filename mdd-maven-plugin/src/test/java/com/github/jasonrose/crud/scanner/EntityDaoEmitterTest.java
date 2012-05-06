@@ -13,7 +13,7 @@ public class EntityDaoEmitterTest {
   @Test
   public void testGenerateModel() throws Exception {
     final EntityDaoEmitter emitter = new EntityDaoEmitter();
-    final ClassScanner scanner = new ClassScanner();
+    final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
     final Model model = scanner.generateModel(Contact.class);
     final Emission out = emitter.emit(model);
     Assert.assertEquals("com.github.jasonrose.crud.om.generated.ContactDao", out.getFilename());

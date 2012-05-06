@@ -1,5 +1,6 @@
 package com.github.jasonrose.crud.scanner;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -14,8 +15,9 @@ import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.sampullara.mustache.Mustache;
 import com.sampullara.mustache.MustacheBuilder;
+import com.sampullara.mustache.MustacheException;
 
-public class EntityDefaultDaoEmitter extends EntityDaoEmitter implements Emitter {
+public class EntityDefaultDaoEmitter extends EntityDaoEmitter {
 
   @SuppressWarnings("unchecked")
   @Override
@@ -37,8 +39,10 @@ public class EntityDefaultDaoEmitter extends EntityDaoEmitter implements Emitter
 
       mustache.execute(out, context);
       output = new Emission(context.get("package") + "." + context.get("entityClassName") + "DefaultDao", out.toString());
-    } catch( final Exception e ) {
-      Throwables.propagate(e);
+    } catch( IOException ioe ) {
+      Throwables.propagate(ioe);
+    } catch( MustacheException me ) {
+      Throwables.propagate(me);
     }
     return output;
   }

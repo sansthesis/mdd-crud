@@ -13,7 +13,7 @@ public class EntityDefaultDaoEmitterTest {
   @Test
   public void testGenerateModel() throws Exception {
     final EntityDefaultDaoEmitter emitter = new EntityDefaultDaoEmitter();
-    final ClassScanner scanner = new ClassScanner();
+    final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
     final Model model = scanner.generateModel(Person.class);
     final Emission out = emitter.emit(model);
     Assert.assertEquals("com.github.jasonrose.crud.om.generated.PersonDefaultDao", out.getFilename());

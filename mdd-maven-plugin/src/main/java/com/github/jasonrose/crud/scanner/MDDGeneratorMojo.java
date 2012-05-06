@@ -1,6 +1,7 @@
 package com.github.jasonrose.crud.scanner;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
@@ -45,12 +47,13 @@ public class MDDGeneratorMojo extends AbstractMojo {
     final Log log = getLog();
 
     outputDirectory.mkdirs();
+    final SourceGenerator sourceGenerator = new SourceGeneratorImpl();
     final Reflections reflections = new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClassLoader()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
     final Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
     log.debug("Generating output for classes: " + entities);
-    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new EntityDaoEmitter(), new EntityDefaultDaoEmitter(), new EntityDefaultResourceEmitter() });
+    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new EntityDaoEmitter(), new EntityDefaultDaoEmitter(), new EntityDefaultResourceEmitter(sourceGenerator) });
     final List<Model> models = Lists.newArrayList();
-    final ClassScanner scanner = new ClassScanner();
+    final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
 
     // Generate an emission for entity x emitter.
     for( final Class<?> entity : entities ) {
@@ -63,7 +66,7 @@ public class MDDGeneratorMojo extends AbstractMojo {
     }
 
     // Generate default Guice module with the generated service bindings defined.
-    final Emission moduleEmission = new DefaultModuleEmitter().emit(models);
+    final Emission moduleEmission = new DefaultModuleEmitter(sourceGenerator).emit(models);
     outputGeneratedFile(outputDirectory, moduleEmission);
   }
 
@@ -75,8 +78,8 @@ public class MDDGeneratorMojo extends AbstractMojo {
       Files.createParentDirs(outputFile);
       outputFile.createNewFile();
       Files.write(emission.getContent(), outputFile, Charsets.UTF_8);
-    } catch( final Exception e ) {
-      throw new MojoExecutionException("Unable to write to file " + outputFile.getAbsolutePath() + ".", e);
+    } catch (IOException ioe) {
+      Throwables.propagate(ioe);
     }
   }
 }

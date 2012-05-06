@@ -1,9 +1,11 @@
 package com.github.jasonrose.crud.scanner;
 
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,14 +27,21 @@ import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
 import com.sampullara.mustache.Mustache;
 import com.sampullara.mustache.MustacheBuilder;
+import com.sampullara.mustache.MustacheException;
 
 public class EntityDaoEmitter extends AbstractEmitter {
 
-  protected Function<Map<String, Object>, Set<Map<String, Object>>> relationshipToImport = new Function<Map<String, Object>, Set<Map<String, Object>>>() {
+  protected static final Function<Map<String, Object>, Set<Map<String, Object>>> TRANSFORM_RELATIONSHIP_TO_IMPORT = new Function<Map<String, Object>, Set<Map<String, Object>>>() {
     @SuppressWarnings("unchecked")
     @Override
     public Set<Map<String, Object>> apply(final Map<String, Object> input) {
-      return (Set<Map<String, Object>>) input.get("imports");
+      final Set<Map<String, Object>> output;
+      if( input == null ) {
+        output = null;
+      } else {
+        output = (Set<Map<String, Object>>) input.get("imports"); 
+      }
+      return output;
     }
   };
 
@@ -55,20 +64,21 @@ public class EntityDaoEmitter extends AbstractEmitter {
 
       mustache.execute(out, context);
       output = new Emission(context.get("package") + "." + context.get("entityClassName") + "Dao", out.toString());
-    } catch( final Exception e ) {
-      Throwables.propagate(e);
+    } catch( IOException ioe ) {
+      Throwables.propagate(ioe);
+    } catch( MustacheException me ) {
+      Throwables.propagate(me);
     }
     return output;
   }
 
   // owner => Owner
   protected String capitalize(final String propertyName) {
-    return String.format("%s%s", propertyName.substring(0, 1).toUpperCase(), propertyName.substring(1));
+    return String.format("%s%s", propertyName.substring(0, 1).toUpperCase(Locale.US), propertyName.substring(1));
   }
 
   protected Map<String, Object> createImport(final Object value) {
-    final Map<String, Object> output = ImmutableMap.of("import", value);
-    return output;
+    return ImmutableMap.of("import", value);
   }
 
   // owners => owner
@@ -86,7 +96,7 @@ public class EntityDaoEmitter extends AbstractEmitter {
     context.put("relationships", relationships);
 
     imports.add(createImport(model.getEntityClassName()));
-    for( final Set<Map<String, Object>> importEntries : Iterables.transform(relationships, relationshipToImport) ) {
+    for( final Set<Map<String, Object>> importEntries : Iterables.transform(relationships, TRANSFORM_RELATIONSHIP_TO_IMPORT) ) {
       imports.addAll(importEntries);
     }
     return context;

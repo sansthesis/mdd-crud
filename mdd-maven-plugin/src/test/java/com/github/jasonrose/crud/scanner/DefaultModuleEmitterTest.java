@@ -15,8 +15,8 @@ public class DefaultModuleEmitterTest {
 
   @Test
   public void testGenerateModel() throws Exception {
-    final Emitter emitter = new DefaultModuleEmitter();
-    final ClassScanner scanner = new ClassScanner();
+    final Emitter emitter = new DefaultModuleEmitter(new SourceGeneratorImpl());
+    final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
     final Emission out = emitter.emit(ImmutableList.of(scanner.generateModel(Contact.class), scanner.generateModel(Person.class), scanner.generateModel(Division.class)));
     Assert.assertEquals("com.github.jasonrose.crud.om.generated.DefaultModule", out.getFilename());
     final String verify = CharStreams.toString(Resources.newReaderSupplier(Thread.currentThread().getContextClassLoader().getResource("DefaultModule.java"), Charsets.UTF_8));

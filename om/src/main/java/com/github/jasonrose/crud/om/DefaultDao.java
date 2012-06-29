@@ -1,7 +1,6 @@
 package com.github.jasonrose.crud.om;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -37,18 +36,6 @@ public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
   @Transactional
   public E get(final Long id) {
     return em.find(entityClass, id);
-  }
-
-  @Override
-  @Transactional
-  public Set<E> getByManyRelationship(final String relationshipName, final Long id) {
-    throw new UnsupportedOperationException("Not implemented.");
-  }
-
-  @Override
-  @Transactional
-  public E getByOneRelationship(final String relationshipName, final Long id) {
-    throw new UnsupportedOperationException("Not implemented.");
   }
 
   @SuppressWarnings("unchecked")

@@ -29,6 +29,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      
       <dependency>
         <groupId>com.github.praxissoftware.poms</groupId>
         <artifactId>com.github.praxissoftware.poms.rest</artifactId>

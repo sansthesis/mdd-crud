@@ -15,22 +15,20 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.github.jasonrose.crud.security.Authorizer;
-import com.github.jasonrose.crud.security.Authorizer.Operation;
-import com.github.jasonrose.crud.validation.Validator;
-import com.praxissoftware.rest.core.AbstractMapEntity;
+/**
+ * This is a simple implementation of a Jersey resource that delegates to a service for CRUD operations.
+ * @author Jason Rose
+ *
+ * @param <E> An entity type.
+ * @param <S> A service for the given entity type.
+ */
+public class DefaultResource<E extends AbstractEntity, S extends Service<E>> {
 
-public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>, A extends Authorizer<E>, V extends Validator<E>> {
-
-  protected final D dao;
-  protected final A authorizer;
-  protected final V validator;
+  protected final S service;
 
   @Inject
-  public DefaultResource(final D dao, final A authorizer, final V validator) {
-    this.dao = dao;
-    this.authorizer = authorizer;
-    this.validator = validator;
+  public DefaultResource(final S service) {
+    this.service = service;
   }
 
   @Path("")
@@ -38,17 +36,14 @@ public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>, A ex
   @Produces({ MediaType.APPLICATION_JSON })
   @Consumes({ MediaType.APPLICATION_JSON })
   public Response create(@Context final UriInfo uriInfo, final E entity) {
-    authorizer.authorize(Operation.CREATE, entity);
-    validator.validate(entity);
-    return Response.ok(dao.create(entity)).status(Status.CREATED).build();
+    return Response.ok(service.create(entity)).status(Status.CREATED).build();
   }
 
   @Path("{id: \\d+}")
   @DELETE
   @Produces({ MediaType.APPLICATION_JSON })
   public Response delete(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
-    authorizer.authorize(Operation.DELETE, id);
-    dao.delete(id);
+    service.delete(id);
     return Response.status(Status.NO_CONTENT).build();
   }
 
@@ -56,16 +51,14 @@ public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>, A ex
   @GET
   @Produces({ MediaType.APPLICATION_JSON })
   public Response get(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
-    authorizer.authorize(Operation.READ, id);
-    return Response.ok(dao.get(id)).build();
+    return Response.ok(service.get(id)).build();
   }
 
   @Path("")
   @GET
   @Produces({ MediaType.APPLICATION_JSON })
   public Response list(@Context final UriInfo uriInfo) {
-    authorizer.authorize(Operation.READ);
-    return Response.ok(dao.list()).build();
+    return Response.ok(service.list()).build();
   }
 
   @Path("{id: \\d+}")
@@ -73,8 +66,6 @@ public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>, A ex
   @Produces({ MediaType.APPLICATION_JSON })
   @Consumes({ MediaType.APPLICATION_JSON })
   public Response update(@Context final UriInfo uriInfo, @PathParam("id") final Long id, final E entity) {
-    authorizer.authorize(Operation.UPDATE, entity);
-    validator.validate(entity);
-    return Response.ok(dao.update(entity)).build();
+    return Response.ok(service.update(id, entity)).build();
   }
 }

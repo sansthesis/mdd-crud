@@ -1,8 +1,13 @@
 package com.github.jasonrose.crud.scanner;
 
+/**
+ * An emission is a generated source file.
+ * @author Jason Rose
+ *
+ */
 public class Emission {
-  private String content;
-  private String filename;
+  private final String content;
+  private final String filename;
 
   public Emission(final String filename, final String content) {
     this.filename = filename;
@@ -10,18 +15,10 @@ public class Emission {
   }
 
   public String getContent() {
-    return this.content;
+    return content;
   }
 
   public String getFilename() {
-    return this.filename;
-  }
-
-  public void setContent(final String content) {
-    this.content = content;
-  }
-
-  public void setFilename(final String filename) {
-    this.filename = filename;
+    return filename;
   }
 }

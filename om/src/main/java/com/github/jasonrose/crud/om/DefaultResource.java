@@ -12,8 +12,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import com.github.jasonrose.crud.security.Authorizer;
 import com.github.jasonrose.crud.security.Authorizer.Operation;
@@ -21,7 +21,7 @@ import com.github.jasonrose.crud.validation.Validator;
 import com.praxissoftware.rest.core.AbstractMapEntity;
 
 public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>, A extends Authorizer<E>, V extends Validator<E>> {
-  
+
   protected final D dao;
   protected final A authorizer;
   protected final V validator;

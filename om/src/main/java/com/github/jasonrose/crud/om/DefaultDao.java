@@ -2,7 +2,6 @@ package com.github.jasonrose.crud.om;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 import com.google.inject.persist.Transactional;
@@ -12,7 +11,6 @@ public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
   protected final Class<? extends E> entityClass;
   protected final EntityManager em;
 
-  @Inject
   public DefaultDao(final Class<? extends E> entityClass, final EntityManager em) {
     this.entityClass = entityClass;
     this.em = em;

@@ -2,8 +2,6 @@ package com.github.jasonrose.crud.om;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.github.jasonrose.crud.security.Authorizer;
 import com.github.jasonrose.crud.security.Authorizer.Operation;
 import com.github.jasonrose.crud.validation.Validator;
@@ -23,7 +21,6 @@ public class DefaultService<E extends AbstractEntity, D extends Dao<E>, A extend
   protected final A authorizer;
   protected final V validator;
 
-  @Inject
   public DefaultService(final D dao, final A authorizer, final V validator) {
     this.dao = dao;
     this.authorizer = authorizer;

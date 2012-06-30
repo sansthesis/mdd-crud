@@ -21,33 +21,41 @@ import com.google.common.collect.Lists;
 public class BeanAnalyzerImpl implements BeanAnalyzer {
   private static final Set<Class<? extends Annotation>> RELATIONSHIP_ANNOTATIONS = ImmutableSet.of(ManyToMany.class, OneToMany.class, ManyToOne.class, OneToOne.class);
 
-  @Override
-  public boolean isDesirableProperty(PropertyDescriptor descriptor) {
-    return descriptor != null && descriptor.getWriteMethod() != null && descriptor.getReadMethod() != null;
-  }
+  private static final Function<Annotation, Class<? extends Annotation>> TRANSFORM_ANNOTATION_TO_CLASS = new Function<Annotation, Class<? extends Annotation>>() {
+    @Override
+    public Class<? extends Annotation> apply(final Annotation input) {
+      Preconditions.checkNotNull(input);
+      return input.annotationType();
+    }
+  };
 
   @Override
   public Predicate<PropertyDescriptor> isDesirableProperty() {
     return new Predicate<PropertyDescriptor>() {
       @Override
-      public boolean apply(PropertyDescriptor input) {
+      public boolean apply(final PropertyDescriptor input) {
         return isDesirableProperty(input);
       }
     };
   }
 
   @Override
+  public boolean isDesirableProperty(final PropertyDescriptor descriptor) {
+    return descriptor != null && descriptor.getWriteMethod() != null && descriptor.getReadMethod() != null;
+  }
+
+  @Override
   public Predicate<PropertyDescriptor> isRelationship() {
     return new Predicate<PropertyDescriptor>() {
       @Override
-      public boolean apply(PropertyDescriptor input) {
+      public boolean apply(final PropertyDescriptor input) {
         return isRelationship(input);
       }
     };
   }
 
   @Override
-  public boolean isRelationship(PropertyDescriptor descriptor) {
+  public boolean isRelationship(final PropertyDescriptor descriptor) {
     boolean isValid = false;
     if( descriptor != null ) {
       final Collection<Class<? extends Annotation>> annotations = Lists.newArrayList(Lists.transform(Arrays.asList(descriptor.getReadMethod().getAnnotations()), TRANSFORM_ANNOTATION_TO_CLASS));
@@ -62,15 +70,7 @@ public class BeanAnalyzerImpl implements BeanAnalyzer {
   }
 
   @Override
-  public boolean isSimpleProperty(PropertyDescriptor descriptor) {
+  public boolean isSimpleProperty(final PropertyDescriptor descriptor) {
     return !isRelationship(descriptor);
   }
-
-  private static final Function<Annotation, Class<? extends Annotation>> TRANSFORM_ANNOTATION_TO_CLASS = new Function<Annotation, Class<? extends Annotation>>() {
-    @Override
-    public Class<? extends Annotation> apply(final Annotation input) {
-      Preconditions.checkNotNull(input);
-      return input.annotationType();
-    }
-  };
 }

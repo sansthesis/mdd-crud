@@ -17,8 +17,6 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
-import com.github.jasonrose.functional.Functional;
-import com.github.jasonrose.functional.FunctionalImpl;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -49,12 +47,10 @@ public class MDDGeneratorMojo extends AbstractMojo {
     final Log log = getLog();
 
     outputDirectory.mkdirs();
-    final SourceGenerator sourceGenerator = new SourceGeneratorImpl();
-    final Functional functional = new FunctionalImpl();
     final Reflections reflections = new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClassLoader()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
     final Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
     log.debug("Generating output for classes: " + entities);
-    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new EntityDaoEmitter(sourceGenerator, functional), new EntityDefaultDaoEmitter(sourceGenerator, functional), new EntityDefaultResourceEmitter(sourceGenerator) });
+    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new GeneratedResourceEmitter(), new GeneratedResourceImplEmitter() });
     final List<Model> models = Lists.newArrayList();
     final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
 
@@ -69,7 +65,7 @@ public class MDDGeneratorMojo extends AbstractMojo {
     }
 
     // Generate default Guice module with the generated service bindings defined.
-    final Emission moduleEmission = new DefaultModuleEmitter(sourceGenerator).emit(models);
+    final Emission moduleEmission = new GeneratedModuleEmitter().emit(models);
     outputGeneratedFile(outputDirectory, moduleEmission);
   }
 
@@ -81,7 +77,7 @@ public class MDDGeneratorMojo extends AbstractMojo {
       Files.createParentDirs(outputFile);
       outputFile.createNewFile();
       Files.write(emission.getContent(), outputFile, Charsets.UTF_8);
-    } catch (IOException ioe) {
+    } catch( final IOException ioe ) {
       Throwables.propagate(ioe);
     }
   }

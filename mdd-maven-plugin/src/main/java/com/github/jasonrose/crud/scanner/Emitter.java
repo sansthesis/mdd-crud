@@ -8,16 +8,16 @@ import java.util.Collection;
  */
 public interface Emitter {
   /**
-   * Generates an Emission for a single Model.
-   * @param model The Model to convert into a generated source file.
-   * @return An Emission of generated source.
-   */
-  Emission emit(Model model);
-
-  /**
    * Generates an Emission for a collection of Models.
    * @param models Models to convert into a generated source file.
    * @return An Emission of generated source.
    */
   Emission emit(Collection<Model> models);
+
+  /**
+   * Generates an Emission for a single Model.
+   * @param model The Model to convert into a generated source file.
+   * @return An Emission of generated source.
+   */
+  Emission emit(Model model);
 }

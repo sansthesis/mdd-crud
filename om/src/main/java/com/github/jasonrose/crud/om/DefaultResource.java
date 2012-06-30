@@ -1,64 +1,46 @@
 package com.github.jasonrose.crud.om;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
+import javax.inject.Inject;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.praxissoftware.rest.core.AbstractMapEntity;
+/**
+ * This is a simple implementation of a Jersey resource that delegates to a service for CRUD operations.
+ * @author Jason Rose
+ *
+ * @param <E> An entity type.
+ * @param <S> A service for the given entity type.
+ */
+public class DefaultResource<E extends AbstractEntity, S extends Service<E>> {
 
-public class DefaultResource<E extends AbstractMapEntity, D extends Dao<E>> {
-  private final D dao;
+  protected final S service;
 
-  public DefaultResource(final D dao) {
-    this.dao = dao;
+  @Inject
+  protected DefaultResource(final S service) {
+    this.service = service;
   }
 
-  @Path("")
-  @POST
-  @Produces({ "application/json" })
-  @Consumes({ "application/json" })
   public Response create(@Context final UriInfo uriInfo, final E entity) {
-    return Response.ok(dao.create(entity)).build();
+    return Response.ok(service.create(entity)).status(Status.CREATED).build();
   }
 
-  @Path("{id: \\d+}")
-  @DELETE
-  @Produces({ "application/json" })
   public Response delete(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
-    return Response.ok(Boolean.valueOf(dao.delete(id))).build();
+    service.delete(id);
+    return Response.status(Status.NO_CONTENT).build();
   }
 
-  @Path("{id: \\d+}")
-  @GET
-  @Produces({ "application/json" })
   public Response get(@Context final UriInfo uriInfo, @PathParam("id") final Long id) {
-    return Response.ok(dao.get(id)).build();
+    return Response.ok(service.get(id)).build();
   }
 
-  @Path("")
-  @GET
-  @Produces({ "application/json" })
   public Response list(@Context final UriInfo uriInfo) {
-    return Response.ok(dao.list()).build();
+    return Response.ok(service.list()).build();
   }
 
-  @Path("{id: \\d+}")
-  @PUT
-  @Produces({ "application/json" })
-  @Consumes({ "application/json" })
   public Response update(@Context final UriInfo uriInfo, @PathParam("id") final Long id, final E entity) {
-    return Response.ok(dao.update(entity)).build();
-  }
-
-  protected D getDao() {
-    return dao;
+    return Response.ok(service.update(id, entity)).build();
   }
 }

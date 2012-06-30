@@ -2,9 +2,12 @@ package com.github.jasonrose.crud.scanner;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collection;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
 import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
@@ -13,11 +16,9 @@ import com.sampullara.mustache.MustacheBuilder;
 import com.sampullara.mustache.MustacheException;
 
 public abstract class AbstractEmitter implements Emitter {
-  
-  private final SourceGenerator sourceGenerator;
-  
-  public AbstractEmitter(SourceGenerator sourceGenerator) {
-    this.sourceGenerator = sourceGenerator;
+  @Override
+  public Emission emit(final Collection<Model> models) {
+    return null;
   }
 
   @Override
@@ -25,19 +26,23 @@ public abstract class AbstractEmitter implements Emitter {
     return null;
   }
 
-  @Override
-  public Emission emit(final Collection<Model> models) {
-    return null;
-  }
-  
   protected Mustache createMustacheTemplate(final String templateName) throws IOException, MustacheException {
     final InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getClassLoader().getResource(templateName), Charsets.UTF_8);
     final String template = CharStreams.toString(supplier);
     return new MustacheBuilder().parse(template, templateName);
   }
 
-  protected SourceGenerator getSourceGenerator() {
-    return sourceGenerator;
+  protected Emission template(final String templateName, final Object context, final String filename) {
+    final Writer out = new StringWriter();
+    try {
+      final Mustache mustache = createMustacheTemplate(templateName);
+      mustache.execute(out, context);
+      return new Emission(filename, out.toString());
+    } catch( final IOException ioe ) {
+      Throwables.propagate(ioe);
+    } catch( final MustacheException e ) {
+      Throwables.propagate(e);
+    }
+    throw new IllegalStateException();
   }
-
 }

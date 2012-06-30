@@ -4,7 +4,7 @@ public class GeneratedModule extends {{{moduleClassName}}} {
   @Override
   protected void configure() {
     {{#bindings}}
-    bind(new {{{typeLiteralClassName}}}<{{{serviceClassName}}}<{{{entityClassName}}}>>() {}).to({{{implementation}}}.class);
+    bind(new {{{typeLiteralClassName}}}<{{{serviceClassName}}}<{{{entityClassName}}}>>() {}).to({{{implementation}}});
     {{/bindings}}
   }
 }

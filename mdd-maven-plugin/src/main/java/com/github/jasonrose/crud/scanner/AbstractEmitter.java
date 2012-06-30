@@ -33,10 +33,9 @@ public abstract class AbstractEmitter implements Emitter {
   }
   
   protected Emission template(String templateName, Object context, String filename) {
+    final Writer out = new StringWriter();
     try {
       final Mustache mustache = createMustacheTemplate(templateName);
-
-      final Writer out = new StringWriter();
       mustache.execute(out, context);
       return new Emission(filename, out.toString());
     } catch( IOException ioe ) {

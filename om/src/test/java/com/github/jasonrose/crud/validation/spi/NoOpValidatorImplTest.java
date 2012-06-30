@@ -4,11 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class NoOpValidatorImplTest {
-  private NoOpValidatorImpl service;
+  private NoOpValidatorImpl<Object> service;
 
   @Before
   public void setUp() {
-    service = new NoOpValidatorImpl();
+    service = new NoOpValidatorImpl<Object>();
   }
 
   @Test

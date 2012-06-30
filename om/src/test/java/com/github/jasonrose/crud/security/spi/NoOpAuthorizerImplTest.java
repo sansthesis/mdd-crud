@@ -7,11 +7,11 @@ import com.github.jasonrose.crud.security.Authorizer.Operation;
 
 public class NoOpAuthorizerImplTest {
 
-  private NoOpAuthorizerImpl service;
+  private NoOpAuthorizerImpl<Object> service;
   
   @Before
   public void setUp() {
-    service = new NoOpAuthorizerImpl();
+    service = new NoOpAuthorizerImpl<Object>();
   }
   
   @Test

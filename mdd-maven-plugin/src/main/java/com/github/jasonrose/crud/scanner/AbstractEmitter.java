@@ -13,13 +13,6 @@ import com.sampullara.mustache.MustacheBuilder;
 import com.sampullara.mustache.MustacheException;
 
 public abstract class AbstractEmitter implements Emitter {
-  
-  private final SourceGenerator sourceGenerator;
-  
-  public AbstractEmitter(SourceGenerator sourceGenerator) {
-    this.sourceGenerator = sourceGenerator;
-  }
-
   @Override
   public Emission emit(final Model model) {
     return null;
@@ -35,9 +28,4 @@ public abstract class AbstractEmitter implements Emitter {
     final String template = CharStreams.toString(supplier);
     return new MustacheBuilder().parse(template, templateName);
   }
-
-  protected SourceGenerator getSourceGenerator() {
-    return sourceGenerator;
-  }
-
 }

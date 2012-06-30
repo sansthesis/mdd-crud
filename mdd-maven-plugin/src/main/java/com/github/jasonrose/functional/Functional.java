@@ -11,6 +11,6 @@ public interface Functional {
    * @param key
    * @return
    */
-  <T> Function<Map<String, Object>, T> pluck(String key);
+  <T> Function<Map<String, ? super T>, T> pluck(String key);
 
 }

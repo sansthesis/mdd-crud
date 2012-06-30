@@ -9,13 +9,13 @@ import com.google.inject.persist.Transactional;
 
 public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
 
-  private final Class<? extends E> entityClass;
+  protected final Class<? extends E> entityClass;
+  protected final EntityManager em;
 
   @Inject
-  protected EntityManager em;
-
-  public DefaultDao(final Class<? extends E> entityClass) {
+  public DefaultDao(final Class<? extends E> entityClass, final EntityManager em) {
     this.entityClass = entityClass;
+    this.em = em;
   }
 
   @Override

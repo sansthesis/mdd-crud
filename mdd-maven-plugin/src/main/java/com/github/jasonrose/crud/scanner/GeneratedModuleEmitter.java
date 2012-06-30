@@ -28,18 +28,24 @@ public class GeneratedModuleEmitter extends AbstractEmitter {
     for( final Model model : models ) {
       final String packageName = model.getEntityClassPackageName() + ".generated";
       context.put("package", packageName);
+      final String baseGeneratedTypeString = packageName + ".Generated" + model.getEntityClassSimpleName();
       
-      bindings.add(createBinding(Dao.class.getName(), model.getEntityClassName(), packageName + ".Generated" + model.getEntityClassSimpleName() + "Dao.class"));
-      bindings.add(createBinding(Service.class.getName(), model.getEntityClassName(), packageName + ".Generated" + model.getEntityClassSimpleName() + "Service.class"));
+      bindings.add(createBinding(Dao.class.getName(), model.getEntityClassName(), baseGeneratedTypeString + "Dao.class"));
+      bindings.add(createBinding(Service.class.getName(), model.getEntityClassName(), baseGeneratedTypeString + "Service.class"));
       bindings.add(createBinding(Validator.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpValidatorImpl.class.getName(), model.getEntityClassName())));
       bindings.add(createBinding(Authorizer.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpAuthorizerImpl.class.getName(), model.getEntityClassName())));
+      bindings.add(createBinding(baseGeneratedTypeString + "Resource.class", baseGeneratedTypeString + "ResourceImpl.class"));
     }
     final String filename = context.get("package") + ".GeneratedModule";
     return template("GeneratedModule.mustache.java", context, filename);
   }
+  
+  private Map<String, String> createBinding(final String from, final String to) {
+    return ImmutableMap.of("from", from, "to", to);
+  }
 
   private Map<String, String> createBinding(final String serviceClassName, final String typeName, final String implementationName) {
-    return ImmutableMap.of("serviceClassName", serviceClassName, "entityClassName", typeName, "implementation", implementationName, "typeLiteralClassName", TypeLiteral.class.getName());
+    return createBinding(String.format("new %s<%s<%s>>() {}", TypeLiteral.class.getName(), serviceClassName, typeName), implementationName);
   }
   
   private String createTypeLiteralTypeString(String wrapperClassName, String implementationClassName, String entityClassName) {

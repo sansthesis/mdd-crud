@@ -1,5 +1,6 @@
 package com.github.jasonrose.crud.om;
 
+import javax.inject.Inject;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -17,7 +18,8 @@ public class DefaultResource<E extends AbstractEntity, S extends Service<E>> {
 
   protected final S service;
 
-  public DefaultResource(final S service) {
+  @Inject
+  protected DefaultResource(final S service) {
     this.service = service;
   }
 

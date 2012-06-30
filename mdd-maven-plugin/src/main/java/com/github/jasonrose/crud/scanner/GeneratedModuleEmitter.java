@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jasonrose.crud.om.Dao;
+import com.github.jasonrose.crud.om.DefaultDao;
+import com.github.jasonrose.crud.om.DefaultService;
 import com.github.jasonrose.crud.om.Service;
 import com.github.jasonrose.crud.security.Authorizer;
 import com.github.jasonrose.crud.security.spi.NoOpAuthorizerImpl;
@@ -30,14 +32,18 @@ public class GeneratedModuleEmitter extends AbstractEmitter {
       context.put("package", packageName);
       final String baseGeneratedTypeString = packageName + ".Generated" + model.getEntityClassSimpleName();
 
-      bindings.add(createBinding(Dao.class.getName(), model.getEntityClassName(), baseGeneratedTypeString + "Dao.class"));
-      bindings.add(createBinding(Service.class.getName(), model.getEntityClassName(), baseGeneratedTypeString + "Service.class"));
+      bindings.add(createBinding(Dao.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), DefaultDao.class.getName(), model.getEntityClassName())));
+      bindings.add(createBinding(Service.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), DefaultService.class.getName(), createServiceParameterizedTypes(model.getEntityClassName()))));
       bindings.add(createBinding(Validator.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpValidatorImpl.class.getName(), model.getEntityClassName())));
       bindings.add(createBinding(Authorizer.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpAuthorizerImpl.class.getName(), model.getEntityClassName())));
       bindings.add(createBinding(baseGeneratedTypeString + "Resource.class", baseGeneratedTypeString + "ResourceImpl.class"));
     }
     final String filename = context.get("package") + ".GeneratedModule";
     return template("GeneratedModule.mustache.java", context, filename);
+  }
+
+  private String createServiceParameterizedTypes(String entityClassName) {
+    return String.format("%s, %s<%s>, %s<%s>, %s<%s>", entityClassName, Dao.class.getName(), entityClassName, Authorizer.class.getName(), entityClassName, Validator.class.getName(), entityClassName);
   }
 
   private Map<String, String> createBinding(final String from, final String to) {

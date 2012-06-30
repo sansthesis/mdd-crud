@@ -82,7 +82,7 @@ public class ContactResourceIntegration {
         input.setContentType("application/json");
         request.setEntity(input);
         final HttpResponse response = client.execute(request);
-        assertEquals(200, response.getStatusLine().getStatusCode());
+        assertEquals(201, response.getStatusLine().getStatusCode());
       }
       {
         final HttpResponse response = new DefaultHttpClient().execute(new HttpGet(URL));

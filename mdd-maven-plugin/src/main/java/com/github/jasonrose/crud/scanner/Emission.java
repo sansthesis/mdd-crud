@@ -3,7 +3,7 @@ package com.github.jasonrose.crud.scanner;
 /**
  * An emission is a generated source file.
  * @author Jason Rose
- *
+ * 
  */
 public class Emission {
   private final String content;

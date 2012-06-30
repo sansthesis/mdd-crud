@@ -24,12 +24,12 @@ public class GeneratedModuleEmitter extends AbstractEmitter {
     context.put("moduleClassName", AbstractModule.class.getName());
     final Set<Map<String, String>> bindings = Sets.newLinkedHashSet();
     context.put("bindings", bindings);
-    
+
     for( final Model model : models ) {
       final String packageName = model.getEntityClassPackageName() + ".generated";
       context.put("package", packageName);
       final String baseGeneratedTypeString = packageName + ".Generated" + model.getEntityClassSimpleName();
-      
+
       bindings.add(createBinding(Dao.class.getName(), model.getEntityClassName(), baseGeneratedTypeString + "Dao.class"));
       bindings.add(createBinding(Service.class.getName(), model.getEntityClassName(), baseGeneratedTypeString + "Service.class"));
       bindings.add(createBinding(Validator.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpValidatorImpl.class.getName(), model.getEntityClassName())));
@@ -39,7 +39,7 @@ public class GeneratedModuleEmitter extends AbstractEmitter {
     final String filename = context.get("package") + ".GeneratedModule";
     return template("GeneratedModule.mustache.java", context, filename);
   }
-  
+
   private Map<String, String> createBinding(final String from, final String to) {
     return ImmutableMap.of("from", from, "to", to);
   }
@@ -47,8 +47,8 @@ public class GeneratedModuleEmitter extends AbstractEmitter {
   private Map<String, String> createBinding(final String serviceClassName, final String typeName, final String implementationName) {
     return createBinding(String.format("new %s<%s<%s>>() {}", TypeLiteral.class.getName(), serviceClassName, typeName), implementationName);
   }
-  
-  private String createTypeLiteralTypeString(String wrapperClassName, String implementationClassName, String entityClassName) {
+
+  private String createTypeLiteralTypeString(final String wrapperClassName, final String implementationClassName, final String entityClassName) {
     return String.format("new %s<%s<%s>>() {}", wrapperClassName, implementationClassName, entityClassName);
   }
 }

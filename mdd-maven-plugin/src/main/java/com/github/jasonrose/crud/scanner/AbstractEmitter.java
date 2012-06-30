@@ -17,30 +17,30 @@ import com.sampullara.mustache.MustacheException;
 
 public abstract class AbstractEmitter implements Emitter {
   @Override
-  public Emission emit(final Model model) {
+  public Emission emit(final Collection<Model> models) {
     return null;
   }
 
   @Override
-  public Emission emit(final Collection<Model> models) {
+  public Emission emit(final Model model) {
     return null;
   }
-  
+
   protected Mustache createMustacheTemplate(final String templateName) throws IOException, MustacheException {
     final InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getClassLoader().getResource(templateName), Charsets.UTF_8);
     final String template = CharStreams.toString(supplier);
     return new MustacheBuilder().parse(template, templateName);
   }
-  
-  protected Emission template(String templateName, Object context, String filename) {
+
+  protected Emission template(final String templateName, final Object context, final String filename) {
     final Writer out = new StringWriter();
     try {
       final Mustache mustache = createMustacheTemplate(templateName);
       mustache.execute(out, context);
       return new Emission(filename, out.toString());
-    } catch( IOException ioe ) {
+    } catch( final IOException ioe ) {
       Throwables.propagate(ioe);
-    } catch( MustacheException e ) {
+    } catch( final MustacheException e ) {
       Throwables.propagate(e);
     }
     throw new IllegalStateException();

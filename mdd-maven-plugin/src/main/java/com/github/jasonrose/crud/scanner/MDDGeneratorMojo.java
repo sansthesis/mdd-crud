@@ -77,7 +77,7 @@ public class MDDGeneratorMojo extends AbstractMojo {
       Files.createParentDirs(outputFile);
       outputFile.createNewFile();
       Files.write(emission.getContent(), outputFile, Charsets.UTF_8);
-    } catch (IOException ioe) {
+    } catch( final IOException ioe ) {
       Throwables.propagate(ioe);
     }
   }

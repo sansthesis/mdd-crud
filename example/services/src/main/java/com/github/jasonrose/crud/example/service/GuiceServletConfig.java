@@ -3,7 +3,6 @@ package com.github.jasonrose.crud.example.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.validation.spi.ValidationProvider;
 
@@ -11,7 +10,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.jasonrose.crud.om.generated.DefaultModule;
+import com.github.jasonrose.crud.om.generated.GeneratedModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.persist.PersistFilter;
@@ -25,11 +24,8 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 public class GuiceServletConfig extends GuiceServletContextListener {
   private final Logger log = LoggerFactory.getLogger(getClass());
 
-  private ServletContext servletContext;
-
   @Override
   public void contextInitialized(final ServletContextEvent servletContextEvent) {
-    servletContext = servletContextEvent.getServletContext();
     super.contextInitialized(servletContextEvent);
   }
 
@@ -50,7 +46,7 @@ public class GuiceServletConfig extends GuiceServletContextListener {
 
         filter("/*").through(PersistFilter.class);
       }
-    }, new DefaultModule());
+    }, new GeneratedModule());
 
     return injector;
   }

@@ -9,13 +9,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
 public class ClassScanner {
-  
+
   private final BeanAnalyzer beanAnalyzer;
-  
+
   public ClassScanner(final BeanAnalyzer beanAnalyzer) {
     this.beanAnalyzer = beanAnalyzer;
   }
-  
+
   public Model generateModel(final Class<?> entityClass) {
     final Model model = new Model();
     model.setEntityClass(entityClass);

@@ -6,7 +6,7 @@ import com.github.jasonrose.crud.om.DefaultResource;
 import com.github.jasonrose.crud.om.Service;
 import com.google.common.collect.Maps;
 
-public class GeneratedResourceEmitter extends AbstractEmitter {
+public class GeneratedResourceImplEmitter extends AbstractEmitter {
   @Override
   public Emission emit(final Model model) {
     final Map<String, Object> context = Maps.newHashMap();
@@ -17,7 +17,7 @@ public class GeneratedResourceEmitter extends AbstractEmitter {
     context.put("entityClassPackageName", model.getEntityClassPackageName());
     context.put("resourceClassName", DefaultResource.class.getName());
     context.put("serviceClassName", Service.class.getName());
-    final String filename = packageName + ".Generated" + model.getEntityClassSimpleName() + "Resource";
-    return template("GeneratedResource.mustache.java", context, filename);
+    final String filename = packageName + ".Generated" + model.getEntityClassSimpleName() + "ResourceImpl";
+    return template("GeneratedResourceImpl.mustache.java", context, filename);
   }
 }

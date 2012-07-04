@@ -16,7 +16,7 @@
   </modules>
   
   <properties>
-    <praxis.version>1.4.0-SNAPSHOT</praxis.version>
+    <praxis.version>1.5.0-SNAPSHOT</praxis.version>
     <praxis-rest.version>2.0.1</praxis-rest.version>
   </properties>
 
@@ -62,13 +62,13 @@
 
       <dependency>
         <groupId>com.github.spullara.mustache.java</groupId>
-        <artifactId>builder</artifactId>
-        <version>0.6.3</version>
+        <artifactId>compiler</artifactId>
+        <version>0.8.3</version>
       </dependency>
       <dependency>
         <groupId>org.reflections</groupId>
         <artifactId>reflections</artifactId>
-        <version>0.9.6</version>
+        <version>0.9.8</version>
       </dependency>
 
       <dependency>

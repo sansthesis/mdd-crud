@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.github.jasonrose.crud.om.DefaultResource;
 import com.github.jasonrose.crud.om.Service;
+import com.github.jasonrose.crud.representation.Representer;
 import com.google.common.collect.Maps;
 
 public class GeneratedResourceImplEmitter extends AbstractEmitter {
@@ -17,6 +18,7 @@ public class GeneratedResourceImplEmitter extends AbstractEmitter {
     context.put("entityClassPackageName", model.getEntityClassPackageName());
     context.put("resourceClassName", DefaultResource.class.getName());
     context.put("serviceClassName", Service.class.getName());
+    context.put("representerClassName", Representer.class.getName());
     final String filename = packageName + ".Generated" + model.getEntityClassSimpleName() + "ResourceImpl";
     return template("GeneratedResourceImpl.mustache.java", context, filename);
   }

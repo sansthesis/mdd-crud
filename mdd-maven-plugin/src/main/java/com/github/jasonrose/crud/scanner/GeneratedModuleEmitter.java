@@ -8,6 +8,8 @@ import com.github.jasonrose.crud.om.Dao;
 import com.github.jasonrose.crud.om.DefaultDao;
 import com.github.jasonrose.crud.om.DefaultService;
 import com.github.jasonrose.crud.om.Service;
+import com.github.jasonrose.crud.representation.Representer;
+import com.github.jasonrose.crud.representation.spi.DefaultRepresenter;
 import com.github.jasonrose.crud.security.Authorizer;
 import com.github.jasonrose.crud.security.spi.NoOpAuthorizerImpl;
 import com.github.jasonrose.crud.validation.Validator;
@@ -36,6 +38,7 @@ public class GeneratedModuleEmitter extends AbstractEmitter {
       bindings.add(createBinding(Service.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), DefaultService.class.getName(), createServiceParameterizedTypes(model.getEntityClassName()))));
       bindings.add(createBinding(Validator.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpValidatorImpl.class.getName(), model.getEntityClassName())));
       bindings.add(createBinding(Authorizer.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpAuthorizerImpl.class.getName(), model.getEntityClassName())));
+      bindings.add(createBinding(Representer.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), DefaultRepresenter.class.getName(), model.getEntityClassName())));
       bindings.add(createBinding(baseGeneratedTypeString + "Resource.class", baseGeneratedTypeString + "ResourceImpl.class"));
     }
     final String filename = context.get("package") + ".GeneratedModule";

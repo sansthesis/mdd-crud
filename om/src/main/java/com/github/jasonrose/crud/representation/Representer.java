@@ -1,5 +1,7 @@
 package com.github.jasonrose.crud.representation;
 
+import java.util.Collection;
+
 import javax.ws.rs.core.UriInfo;
 
 import com.github.jasonrose.crud.om.AbstractEntity;
@@ -14,9 +16,9 @@ import com.praxissoftware.rest.core.Representation;
  */
 public interface Representer<T extends AbstractEntity> {
 
-  Representation generateRepresentation(T entity, Class<?> resourceClass, String getMethodName, UriInfo uriInfo);
-  
-  Representation generateBriefRepresentation(T entity, Class<?> resourceClass, String getMethodName, UriInfo uriInfo);
+  Representation generateListRepresentation(Collection<T> entities, Class<?> resourceClass, String listMethodName, String getMethodName, UriInfo uriInfo);
 
   Link generateLink(T entity, Class<?> resourceClass, String methodName, UriInfo uriInfo, String relation);
+
+  Representation generateRepresentation(T entity, Class<?> resourceClass, String getMethodName, UriInfo uriInfo);
 }

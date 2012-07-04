@@ -18,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.github.jasonrose.crud.om.AbstractEntity;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.praxissoftware.rest.core.BasicRepresentation;
 import com.praxissoftware.rest.core.Link;
 import com.praxissoftware.rest.core.Representation;
@@ -63,32 +65,73 @@ public class DefaultRepresenterTest {
   }
   
   @Test
-  public void testGenerateBriefRepresentationHasSelfLink() {
-    final Representation output = service.generateBriefRepresentation(entity, TestResource.class, "get", uriInfo);
-    final List<Link> links = output.getLinks();
-    Assert.assertEquals(1, links.size());
-    Link selfLink = links.get(0);
-    Assert.assertEquals("test/100", selfLink.getHref().toString());
-    Assert.assertEquals("self", selfLink.getRel());
-    Assert.assertEquals("application/json", selfLink.getType());
+  public void testGenerateLinkUsesRelation() {
+    final Link link = service.generateLink(entity, TestResource.class, "get", uriInfo, "foobar");
+    Assert.assertEquals("foobar", link.getRel());
+    Assert.assertEquals("test/100", link.getHref().toString());
+    Assert.assertEquals("application/json", link.getType());
+    Assert.assertNull(link.getTitle());
+    Assert.assertNull(link.getHrefLang());
+    Assert.assertNull(link.getLength());
   }
   
   @Test
-  public void testGenerateBriefRepresentationHasNoOtherProperties() {
-    final BasicRepresentation output = (BasicRepresentation) service.generateBriefRepresentation(entity, TestResource.class, "get", uriInfo);
+  public void testGenerateListRepresentationHasSelfLink() {
+    final BasicRepresentation output = (BasicRepresentation) service.generateListRepresentation(Lists.<AbstractEntity>newArrayList(), TestResource.class, "list", "get", uriInfo);
+    final List<Link> links = output.getLinks();
+    Assert.assertEquals(1, links.size());
+    boolean selfLinkFound = false;
+    for( final Link link : links ) {
+      if( "self".equals(link.getRel()) ) {
+        selfLinkFound = true;
+      }
+    }
+    Assert.assertTrue(selfLinkFound);
+  }
+  
+  @Test
+  public void testGenerateListRepresentationHasLinks() {
+    final List<AbstractEntity> list = ImmutableList.of(generateEntity(1), generateEntity(2), generateEntity(3));
+    final BasicRepresentation output = (BasicRepresentation) service.generateListRepresentation(list, TestResource.class, "list", "get", uriInfo);
+    final List<Link> links = output.getLinks();
+    Assert.assertEquals(4, links.size());
+    int numItemLinksFound = 0;
+    boolean selfLinkFound = false;
+    for( final Link link : links ) {
+      if( "self".equals(link.getRel()) ) {
+        selfLinkFound = true;
+      } else if( "item".equals(link.getRel()) ) {
+        numItemLinksFound++;
+      }
+    }
+    Assert.assertTrue(selfLinkFound);
+    Assert.assertEquals(3, numItemLinksFound);
+  }
+  
+  @Test
+  public void testGenerateListRepresentationHasNoProperties() {
+    final List<AbstractEntity> list = ImmutableList.of(generateEntity(1), generateEntity(2), generateEntity(3));
+    final BasicRepresentation output = (BasicRepresentation) service.generateListRepresentation(list, TestResource.class, "list", "get", uriInfo);
     Assert.assertEquals(1, output.keySet().size());
-    Assert.assertEquals("links", output.keySet().iterator().next());
+  }
+  
+  private AbstractEntity generateEntity(long id) {
+    final AbstractEntity e = new AbstractEntity() {};
+    e.setId(id);
+    return e;
   }
   
   @Path("test")
   private static class TestResource {
     
+    @SuppressWarnings("unused")
     @GET
     @Path("{id}")
     public Response get(@Context UriInfo uriInfo, @PathParam("id") Long id) {
       return null;
     }
     
+    @SuppressWarnings("unused")
     @GET
     @Path("")
     public Response list(@Context UriInfo uriInfo) {

@@ -1,21 +1,27 @@
 package com.github.jasonrose.crud.om;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import com.google.inject.TypeLiteral;
 import com.google.inject.persist.Transactional;
 
-public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
+public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
 
-  protected final Class<? extends E> entityClass;
+  protected final Class<E> entityClass;
   protected final EntityManager em;
-  
-  protected DefaultDao(final Class<? extends E> entityClass, final EntityManager em) {
+
+  protected DefaultDao(final Class<E> entityClass, final EntityManager em) {
     this.entityClass = entityClass;
-    this.em = em;    
+    this.em = em;
   }
 
   @SuppressWarnings("unchecked")
@@ -39,9 +45,20 @@ public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
   }
 
   @Override
+  public <D extends FluentDao<E>, F extends AbstractFinder<E, D, F>> AbstractFinder<E, D, F> finder() {
+    throw new UnsupportedOperationException("No default implementation for finder.");
+  }
+
+  @Override
   @Transactional
   public E get(final Long id) {
     return em.find(entityClass, id);
+  }
+
+  @Override
+  @Transactional
+  public E get(final Map<String, Object> context) {
+    return toCriteria(context).getSingleResult();
   }
 
   @SuppressWarnings("unchecked")
@@ -54,8 +71,25 @@ public class DefaultDao<E extends AbstractEntity> implements Dao<E> {
 
   @Override
   @Transactional
+  public List<E> list(final Map<String, Object> context) {
+    return toCriteria(context).getResultList();
+  }
+
+  @Override
+  @Transactional
   public E update(final E entity) {
     create(entity);
     return entity;
+  }
+
+  protected TypedQuery<E> toCriteria(final Map<String, Object> context) {
+    final CriteriaBuilder qb = em.getCriteriaBuilder();
+    final CriteriaQuery<E> c = qb.createQuery(entityClass);
+    final Root<E> p = c.from(entityClass);
+    Predicate condition = qb.conjunction();
+    for( final Map.Entry<String, Object> entry : context.entrySet() ) {
+      condition = qb.and(condition, qb.equal(p.get(entry.getKey()), entry.getValue()));
+    }
+    return em.createQuery(c.where(condition));
   }
 }

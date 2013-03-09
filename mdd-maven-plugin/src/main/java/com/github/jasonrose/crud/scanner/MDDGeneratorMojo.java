@@ -50,7 +50,7 @@ public class MDDGeneratorMojo extends AbstractMojo {
     final Reflections reflections = new Reflections(new ConfigurationBuilder().addUrls(ClasspathHelper.forClassLoader()).setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
     final Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
     log.debug("Generating output for classes: " + entities);
-    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new GeneratedResourceEmitter(), new GeneratedResourceImplEmitter() });
+    final List<Emitter> emitters = Arrays.asList(new Emitter[] { new GeneratedResourceEmitter(), new GeneratedResourceImplEmitter(), new GeneratedDaoEmitter() });
     final List<Model> models = Lists.newArrayList();
     final ClassScanner scanner = new ClassScanner(new BeanAnalyzerImpl());
 

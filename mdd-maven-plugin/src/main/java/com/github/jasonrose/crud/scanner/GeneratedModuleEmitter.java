@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.jasonrose.crud.om.Dao;
-import com.github.jasonrose.crud.om.DefaultDao;
 import com.github.jasonrose.crud.om.DefaultService;
+import com.github.jasonrose.crud.om.FluentDao;
 import com.github.jasonrose.crud.om.Service;
 import com.github.jasonrose.crud.security.Authorizer;
 import com.github.jasonrose.crud.security.spi.NoOpAuthorizerImpl;
@@ -32,7 +32,8 @@ public class GeneratedModuleEmitter extends AbstractEmitter {
       context.put("package", packageName);
       final String baseGeneratedTypeString = packageName + ".Generated" + model.getEntityClassSimpleName();
 
-      bindings.add(createBinding(Dao.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), DefaultDao.class.getName(), model.getEntityClassName())));
+      bindings.add(createBinding(Dao.class.getName(), model.getEntityClassName(), String.format("%s.generated.Generated%sDao.class", model.getEntityClassPackageName(), model.getEntityClassSimpleName())));
+      bindings.add(createBinding(FluentDao.class.getName(), model.getEntityClassName(), String.format("%s.generated.Generated%sDao.class", model.getEntityClassPackageName(), model.getEntityClassSimpleName())));
       bindings.add(createBinding(Service.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), DefaultService.class.getName(), createServiceParameterizedTypes(model.getEntityClassName()))));
       bindings.add(createBinding(Validator.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpValidatorImpl.class.getName(), model.getEntityClassName())));
       bindings.add(createBinding(Authorizer.class.getName(), model.getEntityClassName(), createTypeLiteralTypeString(TypeLiteral.class.getName(), NoOpAuthorizerImpl.class.getName(), model.getEntityClassName())));
@@ -42,7 +43,7 @@ public class GeneratedModuleEmitter extends AbstractEmitter {
     return template("GeneratedModule.mustache.java", context, filename);
   }
 
-  private String createServiceParameterizedTypes(String entityClassName) {
+  private String createServiceParameterizedTypes(final String entityClassName) {
     return String.format("%s, %s<%s>, %s<%s>, %s<%s>", entityClassName, Dao.class.getName(), entityClassName, Authorizer.class.getName(), entityClassName, Validator.class.getName(), entityClassName);
   }
 

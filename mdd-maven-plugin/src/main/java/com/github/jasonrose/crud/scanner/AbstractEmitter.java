@@ -6,14 +6,14 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheException;
+import com.github.mustachejava.MustacheFactory;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
-import com.google.common.io.CharStreams;
 import com.google.common.io.InputSupplier;
 import com.google.common.io.Resources;
-import com.sampullara.mustache.Mustache;
-import com.sampullara.mustache.MustacheBuilder;
-import com.sampullara.mustache.MustacheException;
 
 public abstract class AbstractEmitter implements Emitter {
   @Override
@@ -27,9 +27,9 @@ public abstract class AbstractEmitter implements Emitter {
   }
 
   protected Mustache createMustacheTemplate(final String templateName) throws IOException, MustacheException {
+    final MustacheFactory factory = new DefaultMustacheFactory();
     final InputSupplier<InputStreamReader> supplier = Resources.newReaderSupplier(getClass().getClassLoader().getResource(templateName), Charsets.UTF_8);
-    final String template = CharStreams.toString(supplier);
-    return new MustacheBuilder().parse(template, templateName);
+    return factory.compile(supplier.getInput(), templateName);
   }
 
   protected Emission template(final String templateName, final Object context, final String filename) {

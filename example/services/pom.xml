@@ -40,8 +40,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.googlecode.guava-osgi</groupId>
-      <artifactId>guava-osgi</artifactId>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>com.google.inject</groupId>
@@ -55,7 +55,7 @@
 
     <dependency>
       <groupId>com.github.spullara.mustache.java</groupId>
-      <artifactId>builder</artifactId>
+      <artifactId>compiler</artifactId>
     </dependency>
 
     <dependency>

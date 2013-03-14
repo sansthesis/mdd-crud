@@ -19,10 +19,18 @@ public class GeneratedPersonDao extends com.github.jasonrose.crud.om.DefaultDao<
     }
 
     public Finder id(final java.lang.Long value) {
+      return helper("id", com.github.jasonrose.crud.om.Preds.eq(value));
+    }
+
+    public Finder id(final com.github.jasonrose.crud.om.AbstractFinder.Pred<java.lang.Long> value) {
       return helper("id", value);
     }
 
     public Finder something(final java.lang.String value) {
+      return helper("something", com.github.jasonrose.crud.om.Preds.eq(value));
+    }
+
+    public Finder something(final com.github.jasonrose.crud.om.AbstractFinder.Pred<java.lang.String> value) {
       return helper("something", value);
     }
 

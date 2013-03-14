@@ -1,9 +1,11 @@
 package com.github.jasonrose.crud.example.service;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
 
@@ -13,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.github.jasonrose.crud.om.Division;
+import com.github.jasonrose.crud.om.Preds;
 import com.github.jasonrose.crud.om.generated.GeneratedDivisionDao;
 
 public class GeneratedDivisionDaoTest {
@@ -26,14 +29,14 @@ public class GeneratedDivisionDaoTest {
     final EntityManager em = factory.createEntityManager();
     service = new GeneratedDivisionDao(em);
     int i = 0;
+    em.getTransaction().begin();
     for( final String name : "a a a b c".split(" ") ) {
-      em.getTransaction().begin();
       final Division division = new Division();
       division.setName(name);
       division.setNumber(name + i++);
       service.create(division);
-      em.getTransaction().commit();
     }
+    em.getTransaction().commit();
   }
 
   @After
@@ -58,15 +61,48 @@ public class GeneratedDivisionDaoTest {
     service.finder().name("a").get();
   }
 
+  @Test
   public void testOnePropGet() {
     final Division d = service.finder().name("b").get();
     Assert.assertEquals("b", d.getName());
     Assert.assertEquals("b3", d.getNumber());
   }
 
+  @Test(expected = NoResultException.class)
   public void testOnePropGetMiss() {
-    final Division d = service.finder().name("qqqqq").get();
-    Assert.assertNull(d);
+    service.finder().name("qqqqq").get();
+  }
+
+  @Test
+  public void testIsNull() {
+    Assert.assertEquals(5, service.finder().nullableProperty(Preds.<String> eq(null)).list().size());
+    Assert.assertEquals(5, service.finder().nullableProperty(Preds.<String> isNull()).list().size());
+  }
+
+  @Test
+  public void testIn() {
+    Assert.assertEquals(2, service.finder().name(Preds.in(Arrays.asList("b", "c"))).list().size());
+    Assert.assertEquals(3, service.finder().name(Preds.in("a")).list().size());
+    Assert.assertEquals(0, service.finder().name(Preds.in("aoeuaoe")).list().size());
+  }
+
+  @Test
+  public void testNot() {
+    Assert.assertEquals(3, service.finder().name(Preds.not(Preds.in(Arrays.asList("b", "c")))).list().size());
+    Assert.assertEquals(2, service.finder().name(Preds.not(Preds.in("a"))).list().size());
+    Assert.assertEquals(5, service.finder().name(Preds.not(Preds.in("aoeuaoe"))).list().size());
+  }
+
+  @Test
+  public void testAnd() {
+    Assert.assertEquals(3, service.finder().name(Preds.and(Preds.eq("a"))).list().size());
+    Assert.assertEquals(0, service.finder().name(Preds.and(Preds.eq("a"), Preds.eq("b"))).list().size());
+  }
+
+  @Test
+  public void testOr() {
+    Assert.assertEquals(3, service.finder().name(Preds.or(Preds.eq("a"))).list().size());
+    Assert.assertEquals(4, service.finder().name(Preds.or(Preds.eq("a"), Preds.eq("b"))).list().size());
   }
 
 }

@@ -3,10 +3,14 @@ package com.github.jasonrose.crud.om;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Path;
+
 import com.google.common.collect.Maps;
 
 public abstract class AbstractFinder<T, D extends FluentDao<T>, F extends AbstractFinder<T, D, F>> {
-  protected final Map<String, Object> context;
+  protected final Map<String, Pred<?>> context;
   protected final D dao;
 
   public AbstractFinder(final D dao) {
@@ -25,8 +29,15 @@ public abstract class AbstractFinder<T, D extends FluentDao<T>, F extends Abstra
   // http://egalluzzo.blogspot.com/2010/06/using-inheritance-with-fluent.html
   protected abstract F getThis();
 
-  protected F helper(final String key, final Object value) {
+  protected F helper(final String key, final Pred<?> value) {
     context.put(key, value);
     return getThis();
+  }
+
+  public abstract static class Pred<E> {
+    protected Pred() {
+    }
+
+    public abstract Expression<Boolean> toExpression(Path<Object> path, CriteriaBuilder qb);
   }
 }

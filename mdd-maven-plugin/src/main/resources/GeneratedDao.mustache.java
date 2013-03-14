@@ -20,6 +20,10 @@ public class Generated{{{entityClassSimpleName}}}Dao extends {{{daoClassName}}}<
 {{#model.properties}}
 
     public Finder {{name}}(final {{propertyType.name}} value) {
+      return helper("{{name}}", {{preds}}.eq(value));
+    }
+
+    public Finder {{name}}(final {{pred}}<{{propertyType.name}}> value) {
       return helper("{{name}}", value);
     }
 {{/model.properties}}

@@ -11,6 +11,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
+import com.github.jasonrose.crud.om.AbstractFinder.Pred;
 import com.google.inject.TypeLiteral;
 import com.google.inject.persist.Transactional;
 
@@ -57,7 +58,7 @@ public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
 
   @Override
   @Transactional
-  public E get(final Map<String, Object> context) {
+  public E get(final Map<String, Pred<?>> context) {
     return toCriteria(context).getSingleResult();
   }
 
@@ -71,7 +72,7 @@ public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
 
   @Override
   @Transactional
-  public List<E> list(final Map<String, Object> context) {
+  public List<E> list(final Map<String, Pred<?>> context) {
     return toCriteria(context).getResultList();
   }
 
@@ -82,13 +83,13 @@ public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
     return entity;
   }
 
-  protected TypedQuery<E> toCriteria(final Map<String, Object> context) {
+  protected TypedQuery<E> toCriteria(final Map<String, Pred<?>> context) {
     final CriteriaBuilder qb = em.getCriteriaBuilder();
     final CriteriaQuery<E> c = qb.createQuery(entityClass);
     final Root<E> p = c.from(entityClass);
     Predicate condition = qb.conjunction();
-    for( final Map.Entry<String, Object> entry : context.entrySet() ) {
-      condition = qb.and(condition, qb.equal(p.get(entry.getKey()), entry.getValue()));
+    for( final Map.Entry<String, Pred<?>> entry : context.entrySet() ) {
+      condition = qb.and(condition, entry.getValue().toExpression(p.get(entry.getKey()), qb));
     }
     return em.createQuery(c.where(condition));
   }

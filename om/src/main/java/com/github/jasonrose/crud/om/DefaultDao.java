@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -89,7 +90,7 @@ public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
     final Root<E> p = c.from(entityClass);
     Predicate condition = qb.conjunction();
     for( final Map.Entry<String, Pred<?>> entry : context.entrySet() ) {
-      condition = qb.and(condition, entry.getValue().toExpression(p.get(entry.getKey()), qb));
+      condition = qb.and(condition, entry.getValue().toExpression((Path) p.get(entry.getKey()), qb));
     }
     return em.createQuery(c.where(condition));
   }

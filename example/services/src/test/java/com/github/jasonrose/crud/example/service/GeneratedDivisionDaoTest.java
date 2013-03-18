@@ -1,6 +1,7 @@
 package com.github.jasonrose.crud.example.service;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -33,6 +34,7 @@ public class GeneratedDivisionDaoTest {
     for( final String name : "a a a b c".split(" ") ) {
       final Division division = new Division();
       division.setName(name);
+      division.setDateProperty(new Date(System.currentTimeMillis() - (1000l * 60 * 60 * 24 * 365 * i)));
       division.setNumber(name + i++);
       service.create(division);
     }
@@ -103,6 +105,32 @@ public class GeneratedDivisionDaoTest {
   public void testOr() {
     Assert.assertEquals(3, service.finder().name(Preds.or(Preds.eq("a"))).list().size());
     Assert.assertEquals(4, service.finder().name(Preds.or(Preds.eq("a"), Preds.eq("b"))).list().size());
+  }
+
+  @Test
+  public void testLt() {
+    Assert.assertEquals(3, service.finder().id(Preds.lt(4l)).list().size());
+    Assert.assertEquals(2, service.finder().dateProperty(Preds.lt(new Date(System.currentTimeMillis() - (1000l * 60 * 60 * 24 * 365 * 3)))).list().size());
+    Assert.assertEquals(3, service.finder().name(Preds.lt("b")).list().size());
+  }
+
+  @Test
+  public void testLte() {
+    Assert.assertEquals(4, service.finder().id(Preds.lte(4l)).list().size());
+    Assert.assertEquals(3, service.finder().name(Preds.lte("a")).list().size());
+  }
+
+  @Test
+  public void testGt() {
+    Assert.assertEquals(1, service.finder().id(Preds.gt(4l)).list().size());
+    Assert.assertEquals(3, service.finder().dateProperty(Preds.gt(new Date(System.currentTimeMillis() - (1000l * 60 * 60 * 24 * 365 * 3)))).list().size());
+    Assert.assertEquals(1, service.finder().name(Preds.gt("b")).list().size());
+  }
+
+  @Test
+  public void testGte() {
+    Assert.assertEquals(2, service.finder().id(Preds.gte(4l)).list().size());
+    Assert.assertEquals(5, service.finder().name(Preds.gte("a")).list().size());
   }
 
 }

@@ -1,5 +1,6 @@
 package com.github.jasonrose.crud.om;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,6 +38,10 @@ public class Division extends AbstractEntity {
     return getAndCoerce("nullableProperty");
   }
 
+  public Date getDateProperty() {
+    return getAndCoerce("dateProperty");
+  }
+
   public void setContacts(final Set<Contact> contacts) {
     put("contacts", contacts);
   }
@@ -51,6 +56,10 @@ public class Division extends AbstractEntity {
 
   public void setNullableProperty(final String value) {
     put("nullableProperty", value);
+  }
+
+  public void setDateProperty(final Date value) {
+    put("dateProperty", value);
   }
 
 }

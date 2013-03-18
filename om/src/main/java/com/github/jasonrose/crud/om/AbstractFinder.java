@@ -38,6 +38,6 @@ public abstract class AbstractFinder<T, D extends FluentDao<T>, F extends Abstra
     protected Pred() {
     }
 
-    public abstract Expression<Boolean> toExpression(Path<Object> path, CriteriaBuilder qb);
+    public abstract Expression<Boolean> toExpression(Path<E> path, CriteriaBuilder qb);
   }
 }

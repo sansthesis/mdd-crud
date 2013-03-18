@@ -51,18 +51,83 @@ public class Preds {
     return new IsOrPred<E>(toCollection(value, values));
   }
 
+  public static <E extends Comparable<E>> Pred<E> lt(final E value) {
+    return new IsLtPred<E>(value);
+  }
+
+  public static <E extends Comparable<E>> Pred<E> lte(final E value) {
+    return new IsLtePred<E>(value);
+  }
+
+  public static <E extends Comparable<E>> Pred<E> gt(final E value) {
+    return new IsGtPred<E>(value);
+  }
+
+  public static <E extends Comparable<E>> Pred<E> gte(final E value) {
+    return new IsGtePred<E>(value);
+  }
+
   private static <E> Collection<E> toCollection(final E first, final E... rest) {
     final List<E> list = Lists.newArrayList(rest);
     list.add(0, first);
     return list;
   }
 
-  /*
-   * public static <E> Pred<E> lt(final E value) { return null; } public static <E> Pred<E> lte(final E value) { return null; } public static <E> Pred<E> gt(final E value) { return null; } public static <E> Pred<E> gte(final E value) { return null; }
-   */
+  private static class IsGtePred<E extends Comparable<E>> extends AbstractFinder.Pred<E> {
+    private final E value;
+
+    public IsGtePred(final E value) {
+      this.value = value;
+    }
+
+    @Override
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
+      return qb.greaterThanOrEqualTo(path, value);
+    }
+  }
+
+  private static class IsGtPred<E extends Comparable<E>> extends AbstractFinder.Pred<E> {
+    private final E value;
+
+    public IsGtPred(final E value) {
+      this.value = value;
+    }
+
+    @Override
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
+      return qb.greaterThan(path, value);
+    }
+  }
+
+  private static class IsLtePred<E extends Comparable<E>> extends AbstractFinder.Pred<E> {
+    private final E value;
+
+    public IsLtePred(final E value) {
+      this.value = value;
+    }
+
+    @Override
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
+      return qb.lessThanOrEqualTo(path, value);
+    }
+  }
+
+  private static class IsLtPred<E extends Comparable<E>> extends AbstractFinder.Pred<E> {
+    private final E value;
+
+    public IsLtPred(final E value) {
+      this.value = value;
+    }
+
+    @Override
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
+      return qb.lessThan(path, value);
+    }
+  }
+
   private static class IsNullPred<E> extends AbstractFinder.Pred<E> {
     @Override
-    public Expression<Boolean> toExpression(final Path<Object> path, final CriteriaBuilder qb) {
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
       return qb.isNull(path);
     }
   }
@@ -75,7 +140,7 @@ public class Preds {
     }
 
     @Override
-    public Expression<Boolean> toExpression(final Path<Object> path, final CriteriaBuilder qb) {
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
       return qb.equal(path, value);
     }
   }
@@ -88,7 +153,7 @@ public class Preds {
     }
 
     @Override
-    public Expression<Boolean> toExpression(final Path<Object> path, final CriteriaBuilder qb) {
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
       return path.in(values);
     }
   }
@@ -101,7 +166,7 @@ public class Preds {
     }
 
     @Override
-    public Expression<Boolean> toExpression(final Path<Object> path, final CriteriaBuilder qb) {
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
       return qb.not(pred.toExpression(path, qb));
     }
   }
@@ -114,7 +179,7 @@ public class Preds {
     }
 
     @Override
-    public Expression<Boolean> toExpression(final Path<Object> path, final CriteriaBuilder qb) {
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
       Predicate condition = qb.conjunction();
       for( final Pred<E> pred : values ) {
         condition = qb.and(condition, pred.toExpression(path, qb));
@@ -131,7 +196,7 @@ public class Preds {
     }
 
     @Override
-    public Expression<Boolean> toExpression(final Path<Object> path, final CriteriaBuilder qb) {
+    public Expression<Boolean> toExpression(final Path<E> path, final CriteriaBuilder qb) {
       Predicate condition = qb.disjunction();
       for( final Pred<E> pred : values ) {
         condition = qb.or(condition, pred.toExpression(path, qb));

@@ -10,27 +10,37 @@ import javax.persistence.criteria.Path;
 import com.google.common.collect.Maps;
 
 public abstract class AbstractFinder<T, D extends FluentDao<T>, F extends AbstractFinder<T, D, F>> {
-  protected final Map<String, Pred<?>> context;
+  protected final Map<String, Pred<?>> properties;
+  protected final Map<String, Pred<?>> relationships;
   protected final D dao;
 
   public AbstractFinder(final D dao) {
-    context = Maps.newHashMap();
+    properties = Maps.newTreeMap();
+    relationships = Maps.newTreeMap();
     this.dao = dao;
   }
 
   public T get() {
-    return dao.get(context);
+    return dao.get(properties, relationships);
   }
 
   public List<T> list() {
-    return dao.list(context);
+    return dao.list(properties, relationships);
   }
 
   // http://egalluzzo.blogspot.com/2010/06/using-inheritance-with-fluent.html
-  protected abstract F getThis();
+  @SuppressWarnings("unchecked")
+  protected F getThis() {
+    return (F) this;
+  }
 
   protected F helper(final String key, final Pred<?> value) {
-    context.put(key, value);
+    properties.put(key, value);
+    return getThis();
+  }
+  
+  protected F relationshipHelper(final String key, final Pred<?> value) {
+    relationships.put(key, value);
     return getThis();
   }
 

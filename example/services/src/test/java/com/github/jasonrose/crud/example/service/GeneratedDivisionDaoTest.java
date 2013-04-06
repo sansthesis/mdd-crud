@@ -10,14 +10,16 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
 
+import com.github.jasonrose.crud.om.Contact;
+import com.github.jasonrose.crud.om.Division;
+import com.github.jasonrose.crud.om.Preds;
+import com.github.jasonrose.crud.om.generated.GeneratedDivisionDao;
+import com.google.common.collect.Lists;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.github.jasonrose.crud.om.Division;
-import com.github.jasonrose.crud.om.Preds;
-import com.github.jasonrose.crud.om.generated.GeneratedDivisionDao;
 
 public class GeneratedDivisionDaoTest {
 
@@ -30,12 +32,22 @@ public class GeneratedDivisionDaoTest {
     final EntityManager em = factory.createEntityManager();
     service = new GeneratedDivisionDao(em);
     int i = 0;
+    final List<Contact> contacts = Lists.newArrayList();
     em.getTransaction().begin();
     for( final String name : "a a a b c".split(" ") ) {
+      final Contact contact = new Contact();
+      contact.setFirstName(name);
+      contact.setEmail(name + "@com.com");
+      contact.setLastName(name);
+      contact.setZipCode("00000");
+      contacts.add(contact);
+      
       final Division division = new Division();
       division.setName(name);
       division.setDateProperty(new Date(System.currentTimeMillis() - (1000l * 60 * 60 * 24 * 365 * i)));
       division.setNumber(name + i++);
+      division.getContacts().addAll(contacts);
+      em.persist(contact);
       service.create(division);
     }
     em.getTransaction().commit();
@@ -131,6 +143,15 @@ public class GeneratedDivisionDaoTest {
   public void testGte() {
     Assert.assertEquals(2, service.finder().id(Preds.gte(4l)).list().size());
     Assert.assertEquals(5, service.finder().name(Preds.gte("a")).list().size());
+  }
+  
+  @Test
+  public void testEntity() {
+    Assert.assertEquals(5, service.finder().contacts(1l).list().size());
+    Assert.assertEquals(4, service.finder().contacts(2l).list().size());
+    Assert.assertEquals(1, service.finder().contacts(5l).list().size());
+    Assert.assertEquals(3, service.finder().contacts(Preds.or(Preds.eq(3l), Preds.eq(4l))).list().size());
+    Assert.assertEquals("c", service.finder().contacts(5l).get().getName());
   }
 
 }

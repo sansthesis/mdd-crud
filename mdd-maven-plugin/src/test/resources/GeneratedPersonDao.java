@@ -14,7 +14,7 @@ public class GeneratedPersonDao extends com.github.jasonrose.crud.om.DefaultDao<
 
   public static class Finder extends com.github.jasonrose.crud.om.AbstractFinder<com.github.jasonrose.crud.om.Person, GeneratedPersonDao, Finder> {
 
-    public Finder(final GeneratedPersonDao dao) {
+    protected Finder(final GeneratedPersonDao dao) {
       super(dao);
     }
 
@@ -34,9 +34,36 @@ public class GeneratedPersonDao extends com.github.jasonrose.crud.om.DefaultDao<
       return helper("something", value);
     }
 
-    @Override
-    protected Finder getThis() {
-      return this;
+    public Finder childs(final java.lang.Long value) {
+      return relationshipHelper("childs", com.github.jasonrose.crud.om.Preds.eq(value));
+    }
+
+    public Finder childs(final com.github.jasonrose.crud.om.AbstractFinder.Pred<java.lang.Long> value) {
+      return relationshipHelper("childs", value);
+    }
+
+    public Finder friends(final java.lang.Long value) {
+      return relationshipHelper("friends", com.github.jasonrose.crud.om.Preds.eq(value));
+    }
+
+    public Finder friends(final com.github.jasonrose.crud.om.AbstractFinder.Pred<java.lang.Long> value) {
+      return relationshipHelper("friends", value);
+    }
+
+    public Finder parent(final java.lang.Long value) {
+      return relationshipHelper("parent", com.github.jasonrose.crud.om.Preds.eq(value));
+    }
+
+    public Finder parent(final com.github.jasonrose.crud.om.AbstractFinder.Pred<java.lang.Long> value) {
+      return relationshipHelper("parent", value);
+    }
+
+    public Finder spouse(final java.lang.Long value) {
+      return relationshipHelper("spouse", com.github.jasonrose.crud.om.Preds.eq(value));
+    }
+
+    public Finder spouse(final com.github.jasonrose.crud.om.AbstractFinder.Pred<java.lang.Long> value) {
+      return relationshipHelper("spouse", value);
     }
   }
 }

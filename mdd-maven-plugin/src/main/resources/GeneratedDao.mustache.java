@@ -14,7 +14,7 @@ public class Generated{{{entityClassSimpleName}}}Dao extends {{{daoClassName}}}<
 
   public static class Finder extends {{{finderClassName}}}<{{{entityClassName}}}, Generated{{{entityClassSimpleName}}}Dao, Finder> {
 
-    public Finder(final Generated{{{entityClassSimpleName}}}Dao dao) {
+    protected Finder(final Generated{{{entityClassSimpleName}}}Dao dao) {
       super(dao);
     }
 {{#model.properties}}
@@ -27,10 +27,15 @@ public class Generated{{{entityClassSimpleName}}}Dao extends {{{daoClassName}}}<
       return helper("{{name}}", value);
     }
 {{/model.properties}}
+{{#relationships}}
 
-    @Override
-    protected Finder getThis() {
-      return this;
+    public Finder {{key}}(final {{value.name}} value) {
+      return relationshipHelper("{{key}}", {{preds}}.eq(value));
     }
+
+    public Finder {{key}}(final {{pred}}<{{value.name}}> value) {
+      return relationshipHelper("{{key}}", value);
+    }
+{{/relationships}}
   }
 }

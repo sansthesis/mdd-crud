@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -59,8 +60,8 @@ public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
 
   @Override
   @Transactional
-  public E get(final Map<String, Pred<?>> context) {
-    return toCriteria(context).getSingleResult();
+  public E get(final Map<String, Pred<?>> properties, final Map<String, Pred<?>> relationships) {
+    return toCriteria(properties, relationships).getSingleResult();
   }
 
   @SuppressWarnings("unchecked")
@@ -73,8 +74,8 @@ public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
 
   @Override
   @Transactional
-  public List<E> list(final Map<String, Pred<?>> context) {
-    return toCriteria(context).getResultList();
+  public List<E> list(final Map<String, Pred<?>> properties, final Map<String, Pred<?>> relationships) {
+    return toCriteria(properties, relationships).getResultList();
   }
 
   @Override
@@ -84,7 +85,7 @@ public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
     return entity;
   }
 
-  protected TypedQuery<E> toCriteria(final Map<String, Pred<?>> context) {
+  protected TypedQuery<E> toCriteria(final Map<String, Pred<?>> context, final Map<String, Pred<?>> relationships) {
     final CriteriaBuilder qb = em.getCriteriaBuilder();
     final CriteriaQuery<E> c = qb.createQuery(entityClass);
     final Root<E> p = c.from(entityClass);
@@ -92,6 +93,11 @@ public class DefaultDao<E extends AbstractEntity> implements FluentDao<E> {
     for( final Map.Entry<String, Pred<?>> entry : context.entrySet() ) {
       condition = qb.and(condition, entry.getValue().toExpression((Path) p.get(entry.getKey()), qb));
     }
+    for( final Map.Entry<String, Pred<?>> entry : relationships.entrySet() ) {
+      final Join<Object, Object> join = p.join(entry.getKey());
+      condition = qb.and(condition, entry.getValue().toExpression((Path) join.get("id"), qb));
+    }
+    c.distinct(true);
     return em.createQuery(c.where(condition));
   }
 }
